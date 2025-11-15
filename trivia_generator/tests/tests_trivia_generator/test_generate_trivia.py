@@ -1,24 +1,31 @@
 import pytest
-from src.trivia_generator import TriviaGenerator
 
-class MockAPIClient:
-    def get_completion(self, prompt):
-        return "Ciekawostka testowa o kosmosie (https://pl.wikipedia.org/wiki/Kosmos)."
+def test_generate_trivia_valid_input(trivia_generator):
+    # Arrange
+    generator = trivia_generator
 
-def test_generate_trivia_valid_input():
-    generator = TriviaGenerator(api_client=MockAPIClient())
+    # Act
     result = generator.generate_trivia("kosmos")
-    assert "Ciekawostka" in result["trivia"]
-    assert result["source"].startswith("https://")
 
-def test_generate_trivia_invalid_input():
-    generator = TriviaGenerator(api_client=MockAPIClient())
+    # Assert
+    assert result["trivia"].startswith("Ciekawostka")
+    assert result["source"] == "https://example.com"
+
+def test_generate_trivia_invalid_input_empty(trivia_generator):
+    # Arrange
+    generator = trivia_generator
+
+    # Act / Assert
     with pytest.raises(ValueError):
         generator.generate_trivia("")
 
-# do innego pliku
-# def test_generate_json_response():
-#     generator = TriviaGenerator(api_client=MockAPIClient())
-#     json_str = generator.generate_json_response("koty")
-#     assert '"trivia":' in json_str
-#     assert '"source":' in json_str
+
+
+def test_generate_trivia_invalid_input_too_short(trivia_generator):
+    # Arrange
+    generator = trivia_generator
+
+    # Act / Assert
+    with pytest.raises(ValueError):
+        generator.generate_trivia("ja")
+

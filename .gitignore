@@ -1,0 +1,16 @@
+# Wirtualne środowisko
+venv/
+.env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Systemowe
+.DS_Store
+Thumbs.db
+
