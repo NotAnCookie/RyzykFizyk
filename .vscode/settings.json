@@ -1,0 +1,11 @@
+{
+    "python.testing.pytestArgs": [
+        "trivia_generator"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.analysis.extraPaths": [
+        "./src",
+        "./AnswerVerification/src"
+    ]
+}
