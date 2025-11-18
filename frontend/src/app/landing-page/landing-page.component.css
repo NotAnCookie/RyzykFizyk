@@ -1,0 +1,36 @@
+/* Te style symulują działanie wysuwanego panelu,
+  ponieważ nie mamy gotowego komponentu <Sheet> jak w React.
+*/
+
+/* Półprzezroczyste tło */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5); 
+  z-index: 40;
+}
+
+/* Właściwa zawartość panelu */
+.sheet-content {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 300px; 
+  background: white; 
+  background-image: linear-gradient(to bottom right, #f3e8ff, #fce7f3); 
+  border-left: 1px solid #e9d5ff; 
+  padding: 1.5rem; 
+  z-index: 50;
+  
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
