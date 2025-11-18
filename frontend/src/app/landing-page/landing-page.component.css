@@ -1,6 +1,3 @@
-/* Te style symulują działanie wysuwanego panelu,
-  ponieważ nie mamy gotowego komponentu <Sheet> jak w React.
-*/
 
 /* Półprzezroczyste tło */
 .sheet-overlay {
