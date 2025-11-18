@@ -1,9 +1,10 @@
 from dataclasses import dataclass
+from enums import *
 
 @dataclass
 class VerificationRequest:
     question_text: str
-    language: str  # "PL" or "EN"
+    language: Language
     numeric_answer: float
 
 @dataclass

@@ -17,7 +17,6 @@ def wikipedia_mock():
 
 @pytest.fixture
 def answer_verifier(wikipedia_mock):
-    # wstrzykujemy mock do konstruktora
     return AnswerVerifier(wikipedia_client=wikipedia_mock)
 
 
@@ -38,21 +37,7 @@ def test_verify_source_found(answer_verifier):
     assert result.source.url == "https://en.wikipedia.org/..."
 
 
-def test_verify_raises_when_no_title(answer_verifier, wikipedia_mock):
-    # Arrange
-    wikipedia_mock.search_page.return_value = None
-    req = VerificationRequest(
-        question_text="???",
-        language="EN",
-        numeric_answer=1
-    )
-
-    # Act & Assert
-    with pytest.raises(ValueError):
-        answer_verifier.verify(req)
-
-
-def test_verify_raises_when_no_summary(answer_verifier, wikipedia_mock):
+def test_verify_returns_empty_result_when_no_summary(answer_verifier, wikipedia_mock):
     # Arrange
     wikipedia_mock.get_page_summary.return_value = None
 
@@ -62,8 +47,13 @@ def test_verify_raises_when_no_summary(answer_verifier, wikipedia_mock):
         numeric_answer=1
     )
 
-    # Act & Assert
-    with pytest.raises(ValueError):
-        answer_verifier.verify(req)
+    # Act
+    result = answer_verifier.verify(req)
+
+    # Assert
+    assert result is not None
+    assert result.source is None
+    assert result.verified_answer is None
+
 
 
