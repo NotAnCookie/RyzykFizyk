@@ -1,7 +1,7 @@
 import re
-from models import VerificationRequest, VerificationResult, SourceMetadata
-from wikipedia_client import WikipediaClient
-from enums import Language
+from services.answer_verification.src.models import VerificationRequest, VerificationResult, SourceMetadata
+from services.answer_verification.src.wikipedia_client import WikipediaClient
+from services.answer_verification.src.enums import Language
 
 class AnswerVerifier:
     def __init__(self, wikipedia_client=None):

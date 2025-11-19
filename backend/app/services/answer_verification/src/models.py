@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enums import *
+from services.answer_verification.src.enums import *
 
 @dataclass
 class VerificationRequest:
