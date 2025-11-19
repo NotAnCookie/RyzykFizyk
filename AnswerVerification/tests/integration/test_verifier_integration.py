@@ -1,7 +1,7 @@
 import pytest
 from wikipedia_client import WikipediaClient
 from verifier import AnswerVerifier
-from schemas import VerificationRequest
+from models import VerificationRequest
 from enums import Language
 
 pytestmark = pytest.mark.integration
@@ -20,10 +20,11 @@ def test_answer_verifier_integration():
     # Act
     result = verifier.verify(request)
 
-    # Printujemy wynik
+    # Print
     print(f"Verified answer: {result.verified_answer}")
     print(f"Source: {result.source}")
 
+    # Assert
     # Jeśli nic nie znaleziono
     if result.source is None:
         assert result.verified_answer is None

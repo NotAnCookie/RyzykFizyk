@@ -1,14 +1,11 @@
 import re
-from schemas import VerificationRequest, VerificationResult, SourceMetadata
+from models import VerificationRequest, VerificationResult, SourceMetadata
 from wikipedia_client import WikipediaClient
 from enums import Language
 
 class AnswerVerifier:
     def __init__(self, wikipedia_client=None):
         self.wikipedia_client = wikipedia_client
-
-    def extract_numbers(self, text):
-        return [float(x.replace(",", ".")) for x in re.findall(r'\d+(?:[\.,]\d+)?', text)]
 
     def verify(self, request: VerificationRequest) -> VerificationResult:
         wiki = self.wikipedia_client or WikipediaClient(

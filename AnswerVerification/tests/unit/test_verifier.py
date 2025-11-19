@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 from verifier import AnswerVerifier
-from schemas import VerificationRequest
+from models import VerificationRequest
 
 @pytest.fixture
 def wikipedia_mock():
