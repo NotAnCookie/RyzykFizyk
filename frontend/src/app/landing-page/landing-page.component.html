@@ -1,4 +1,4 @@
-<div class="relative min-h-screen bg-gradient-to-r from-purple-200 to-pink-200">
+<div class="relative min-h-screen bg-gradient-to-r from-purple-300 to-pink-300">
 
   <div *ngIf="!showQuestionCard" class = "min-h-screen flex flex-col">
   <header class="flex justify-end items-center p-6 gap-4">
@@ -98,8 +98,15 @@
 <div *ngIf="showAnswerCard" class="absolute inset-0 z-10 bg-white">
   <app-question-answer-card
     (back)="showAnswerCard=false" 
-  (next) = "showAnswerCard=false">
+  (next) = "showAnswerCard=false; showGameSummary = true">
   ></app-question-answer-card>
+</div>
+
+<div *ngIf="showGameSummary" class="absolute inset-0 z-10 bg-white">
+  <app-game-summary
+    (back)="showGameSummary=false" 
+    (playAgain) = "showGameSummary = false">
+  </app-game-summary>
 </div>
 
 </div>

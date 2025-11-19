@@ -5,6 +5,7 @@ import { SettingsComponent } from '../settings/settings.component';
 //import { UserProfileComponent } from '../user-profile/user-profile.component';
 import { QuestionCardComponent } from '../question-card/question-card.component';
 import { QuestionAnswerCardComponent } from '../question-answer-card/question-answer-card.component';
+import { GameSummaryComponent } from '../game-summary/game-summary.component';
 
 @Component({
   selector: 'app-landing-page',
@@ -15,7 +16,8 @@ import { QuestionAnswerCardComponent } from '../question-answer-card/question-an
     SettingsComponent,
     //UserProfileComponent
     QuestionCardComponent,
-    QuestionAnswerCardComponent
+    QuestionAnswerCardComponent,
+    GameSummaryComponent
   ],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css'
@@ -30,6 +32,7 @@ export class LandingPageComponent {
 
   showQuestionCard: boolean = false;
   showAnswerCard:boolean = false;
+  showGameSummary:boolean = false;
 
   categories = [
     { id: '1', name: 'Geography' },
