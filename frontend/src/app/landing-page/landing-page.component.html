@@ -1,9 +1,11 @@
 <div class="relative min-h-screen bg-gradient-to-r from-purple-200 to-pink-200">
 
+  <div *ngIf="!showQuestionCard" class = "min-h-screen flex flex-col">
   <header class="flex justify-end items-center p-6 gap-4">
-    <button (click)="openProfile()" class="cursor-pointer h-10 w-10 border-2 border-white shadow-sm hover:shadow-md transition-shadow rounded-full bg-purple-200 text-purple-700 flex items-center justify-center">
+    <!--NA RAZIE BRAK LOGIKI LOGOWANIA WIĘC TEŻ BRAK PROFILU UŻYTKOWNIKA-->
+    <!--<button (click)="openProfile()" class="cursor-pointer h-10 w-10 border-2 border-white shadow-sm hover:shadow-md transition-shadow rounded-full bg-purple-200 text-purple-700 flex items-center justify-center">
       <span>👤</span>
-    </button>
+    </button>-->
     
     <button (click)="openSettings()" class="cursor-pointer h-10 w-10 border-2 border-white shadow-sm hover:shadow-md transition-shadow rounded-full bg-purple-200 text-purple-700 flex items-center justify-center">
       <span class="text-xl">⚙️</span>
@@ -47,11 +49,14 @@
     </div>
   </main>
 
-<div *ngIf="isProfileOpen">
+
+<!--<div *ngIf="isProfileOpen">
   <div (click)="isProfileOpen = false" class="sheet-overlay"></div>
   <div class="sheet-content">
     <h3 class="text-purple-900 text-lg font-semibold">Profile</h3>
-    <div>Tutaj byłby komponent</div> 
+    
+    <app-user-profile></app-user-profile>
+
     <button (click)="isProfileOpen = false" 
     class="
     w-full
@@ -69,33 +74,32 @@
     hover:border-purple-300
   "> Close</button>
   </div>
- </div>
+ </div>-->
 
 
 <div *ngIf="isSettingsOpen">
   <div (click)="isSettingsOpen = false" class="sheet-overlay"></div>
   <div class="sheet-content">
     <h3 class="text-purple-900 text-lg font-semibold">Settings</h3>
-    <div>Tutaj byłby komponent</div> 
-    <button (click)="isSettingsOpen = false" 
-    class="
-    w-full
-    flex items-center justify-center
-    py-2 px-3
-    bg-white
-    text-purple-700
-    font-semibold
-    border border-gray-200
-    rounded-lg
-    shadow-sm
-    cursor-pointer
-    transition-all
-    hover:bg-purple-50
-    hover:border-purple-300
-  "> Close</button>
+    
+    <app-settings (close)="isSettingsOpen = false"></app-settings>
     
   </div>
  </div>
+</div>
 
+<div *ngIf="showQuestionCard" class="absolute inset-0 z-10 bg-white">
+  <app-question-card 
+  (back)="showQuestionCard=false" 
+  (next) = "showAnswerCard=true; showQuestionCard=false">
+</app-question-card>
+</div>
+
+<div *ngIf="showAnswerCard" class="absolute inset-0 z-10 bg-white">
+  <app-question-answer-card
+    (back)="showAnswerCard=false" 
+  (next) = "showAnswerCard=false">
+  ></app-question-answer-card>
+</div>
 
 </div>

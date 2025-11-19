@@ -1,42 +1,50 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { FormsModule } from '@angular/forms'; 
+import { SettingsComponent } from '../settings/settings.component';
+//import { UserProfileComponent } from '../user-profile/user-profile.component';
+import { QuestionCardComponent } from '../question-card/question-card.component';
+import { QuestionAnswerCardComponent } from '../question-answer-card/question-answer-card.component';
 
 @Component({
   selector: 'app-landing-page',
   standalone: true, 
   imports: [
     CommonModule, 
-    FormsModule  
+    FormsModule,  
+    SettingsComponent,
+    //UserProfileComponent
+    QuestionCardComponent,
+    QuestionAnswerCardComponent
   ],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css'
 })
 export class LandingPageComponent {
   
-  isProfileOpen: boolean = false;
+  //isProfileOpen: boolean = false;
   isSettingsOpen: boolean = false;
   
 
   selectedCategory: string = ''; 
 
-  showTriviaQuestion: boolean = false;
+  showQuestionCard: boolean = false;
+  showAnswerCard:boolean = false;
 
   categories = [
-    { id: 'cat_1', name: 'Mechanika Klasyczna' },
-    { id: 'cat_2', name: 'Termodynamika' },
-    { id: 'cat_3', name: 'Elektromagnetyzm' },
-    { id: 'cat_4', name: 'Fizyka Kwantowa' }
+    { id: '1', name: 'Geography' },
+    { id: '2', name: 'Biology' },
+    { id: '3', name: 'Physics' },
+    { id: '4', name: 'Animals' }
   ];
 
   startGame() {
-    this.showTriviaQuestion = true;
-    console.log('Rozpoczynanie gry z kategorią:', this.selectedCategory);
+    this.showQuestionCard = true;
   }
 
-  openProfile() {
+  /*openProfile() {
     this.isProfileOpen = true;
-  }
+  }*/
 
   openSettings() {
     this.isSettingsOpen = true;

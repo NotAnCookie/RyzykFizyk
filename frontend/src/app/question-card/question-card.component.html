@@ -1,0 +1,43 @@
+<div class="min-h-screen bg-gradient-to-r from-pink-300 to-purple-300 flex flex-col">
+  
+  <div class="p-6">
+    <button 
+      (click)="handleBack()"
+      class="flex items-center gap-2 text-purple-600 hover:text-purple-900 transition-colors"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
+        <path d="m12 19-7-7 7-7"/>
+        <path d="M19 12H5"/>
+      </svg>
+      <span>Back</span>
+    </button>
+  </div>
+
+  <div class="flex-1 flex items-center justify-center px-6 pb-12">
+    
+    <div class="w-full max-w-2xl bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 border border-purple-300 shadow-2xl rounded-xl overflow-hidden">
+      
+      <div class="p-6 space-y-1.5">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-purple-600 px-3 py-1 bg-purple-200 rounded-full text-sm font-medium">
+            {{ question.category }}
+          </span>
+          <span class="text-purple-600 text-sm">Question 1 of 7</span>
+        </div>
+        <h3 class="text-purple-900 text-center mt-4 text-2xl font-semibold leading-none tracking-tight">
+          {{ question.text }}
+        </h3>
+      </div>
+          <div class="flex items-center justify-center p-6 pt-2">
+        <button
+          (click)="handleNext()"
+          class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-purple-300 to-pink-300 hover:from-purple-400 hover:to-pink-400 text-purple-900 shadow-lg hover:shadow-xl px-12 py-6 rounded-full h-10"
+        >
+          Show Answer
+        </button>
+      </div>
+        </div>
+      </div>
+
+    </div>
+
