@@ -9,7 +9,7 @@ class AnswerVerifier:
 
     def verify(self, request: VerificationRequest) -> VerificationResult:
         wiki = self.wikipedia_client or WikipediaClient(
-            language=Language.PL if request.language == Language.PL else Language.ENG
+            language = Language(request.language)
         )
 
         title = wiki.search_page(request.question_text)

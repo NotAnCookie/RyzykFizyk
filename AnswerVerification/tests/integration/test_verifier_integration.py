@@ -8,7 +8,7 @@ pytestmark = pytest.mark.integration
 
 def test_answer_verifier_integration():
     # Arrange
-    wiki_client = WikipediaClient(language=Language.PL.value)
+    wiki_client = WikipediaClient(language=Language.PL)
     verifier = AnswerVerifier(wikipedia_client=wiki_client)
 
     request = VerificationRequest(

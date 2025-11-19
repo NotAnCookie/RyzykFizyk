@@ -5,13 +5,13 @@ from enums import Language
 
 
 class WikipediaClient:
-    def __init__(self, language="pl"):
+    def __init__(self, language=Language.PL):
         self.language = language  
 
         self.headers = {
             "User-Agent": "TriviaVerifier/1.0 (agabibek1@gmail.com)"
         }
-        self.kw_extractor = yake.KeywordExtractor(lan=language, n=1, top=1)
+        self.kw_extractor = yake.KeywordExtractor(lan=language.value, n=1, top=1)
 
 
     def extract_keyword(self, question: str) -> str:
@@ -29,7 +29,7 @@ class WikipediaClient:
         keyword = self.extract_keyword(question)
         print(f"Keyword: {keyword}")
 
-        url = f"https://{self.language}.wikipedia.org/w/api.php"
+        url = f"https://{self.language.value}.wikipedia.org/w/api.php"
         params = {
             "action": "query",
             "list": "search",
@@ -56,7 +56,7 @@ class WikipediaClient:
         return results[0]["title"]
 
     def get_page_summary(self, title):
-        url = f"https://{self.language}.wikipedia.org/api/rest_v1/page/summary/{title}"
+        url = f"https://{self.language.value}.wikipedia.org/api/rest_v1/page/summary/{title}"
         response = requests.get(url, headers=self.headers)
 
         if response.status_code != 200:

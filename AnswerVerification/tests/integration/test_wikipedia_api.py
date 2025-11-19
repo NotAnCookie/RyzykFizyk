@@ -6,7 +6,7 @@ pytestmark = pytest.mark.integration
 
 def test_wikipedia_search_real():
     # Arrange
-    client = WikipediaClient(language=Language.PL.value)
+    client = WikipediaClient(language=Language.PL)
     query = "Ile kilometrów ma rzeka Wisła"
     
     # Act
@@ -23,7 +23,7 @@ def test_wikipedia_search_real():
 
 def test_wikipedia_summary_real():
     # Arrnge
-    client = WikipediaClient(language=Language.PL.value)
+    client = WikipediaClient(language=Language.PL)
     page = "Wisła"
 
     # Act
