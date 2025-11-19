@@ -12,6 +12,7 @@ class AnswerVerifier:
             language = Language(request.language)
             #language=Language.PL if request.language == Language.PL else Language.ENG
         )
+        print(f"{request.language}")
 
         title = wiki.search_page(request.question_text)
         if not title:

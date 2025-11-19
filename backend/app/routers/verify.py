@@ -10,13 +10,14 @@ verifier = AnswerVerifier()
 class VerifyRequest(BaseModel):
     question_id: str
     answer: str
+    language: str #to do: Enums
 
 @router.post("/")
 def verify_endpoint(request: VerifyRequest):
     verification_request = VerificationRequest(
         question_text=request.question_id,
         numeric_answer=float(request.answer),
-        language="pl"
+        language=request.language
     )
     result = verifier.verify(verification_request)
     return {"correct": result.verified_answer, "source": result.source}
