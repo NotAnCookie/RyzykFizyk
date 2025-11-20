@@ -1,7 +1,6 @@
 import pytest
 from generator.trivia_generator import TriviaGenerator
 
-# Mock API Client, który będzie używany we wszystkich testach
 class MockAPIClient:
     def get_completion(self, prompt):
         return "Ciekawostka testowa (https://example.com)."

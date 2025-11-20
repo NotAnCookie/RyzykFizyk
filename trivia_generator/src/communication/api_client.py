@@ -1,5 +1,5 @@
 class APIClient:
-    """Mock lub placeholder dla przyszłego klienta API (np. OpenAI, HuggingFace)."""
+    """Mock dla przyszłego klienta API """
 
     def get_completion(self, prompt: str) -> str:
         """Zwraca przykładową odpowiedź — do testów offline."""
