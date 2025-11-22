@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from enums import *
+from .enums import *
 
 class VerifyRequestDTO(BaseModel):
     question_id: str

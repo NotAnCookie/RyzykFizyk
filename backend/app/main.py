@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import verify
+from app.routers import verify
 
 app = FastAPI(title="Quiz Backend")
 

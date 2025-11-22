@@ -6,6 +6,7 @@
         "app/services/answer_verification/src",
         "./app",
         "./backend/app",
+        "./backend",
     ],
     "files.exclude": {
         "**/__pycache__": true
