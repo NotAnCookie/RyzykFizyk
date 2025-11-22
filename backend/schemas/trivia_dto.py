@@ -9,9 +9,9 @@ class TriviaRequestDTO(BaseModel):
 
 
 class SourceMetadataDTO(BaseModel):
-    url: Optional[str]
+    url: Optional[str] = None
 
 
 class TriviaResultDTO(BaseModel):
     trivia: str
-    source: Optional[SourceMetadataDTO]
+    source: Optional[SourceMetadataDTO] = None
