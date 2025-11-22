@@ -2,8 +2,8 @@
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "python.analysis.extraPaths": [
-        "./backend/app/services/answer_verification/src",
-        "app/services/answer_verification/src",
+        "./backend/services/answer_verification/src",
+        "services/answer_verification/src",
         "./app",
         "./backend/app",
         "./backend",
