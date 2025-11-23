@@ -86,6 +86,15 @@ class SessionManager:
         return verify_result
     
 
+    def end_session(self, session_id: int) -> GameSession:
+        session = self.sessions.get(session_id)
+        if not session:
+            raise KeyError(f"Session {session_id} not found")
+        
+        session.state = SessionState.ENDED
+        return session
+    
+
     
 
 

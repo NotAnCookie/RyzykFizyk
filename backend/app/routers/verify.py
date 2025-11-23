@@ -3,7 +3,10 @@ from schemas.verify_dto import VerifyRequestDTO
 from mappers.verify_mapper import dto_to_domain
 from services.answer_verification.src.verifier import AnswerVerifier
 
-router = APIRouter(prefix="/verify")
+router = APIRouter(
+    prefix="/verify",
+    tags=["Verification"]  
+)
 verifier = AnswerVerifier()
 
 @router.post("/")
