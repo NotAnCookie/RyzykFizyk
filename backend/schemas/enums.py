@@ -9,6 +9,7 @@ class SessionState(Enum):
     IN_PROGRESS = 1
     SUMMARY = 2
     ENDED = 3
+    LOADING = 4
 
 class Category(str,Enum):
     RANDOM = "random"
