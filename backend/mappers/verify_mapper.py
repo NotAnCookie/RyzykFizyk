@@ -11,6 +11,6 @@ def dto_to_domain(dto: VerifyRequestDTO) -> VerificationRequest:
 def domain_to_dto(domain: VerificationRequest) -> VerifyRequestDTO:
     return VerifyRequestDTO(
         question_id=domain.question_text,
-        answer=str(domain.numeric_answer),
+        answer=domain.numeric_answer,
         language=domain.language,
     )

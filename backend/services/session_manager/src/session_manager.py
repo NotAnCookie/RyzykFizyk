@@ -74,7 +74,7 @@ class SessionManager:
 
         # źródło
         verify_result = await self.verify_service.verify(question.text, answer.value)
-        question.sourceUrl = verify_result.source
+        question.sourceUrl = verify_result.source.url
 
         # ciekawostka
         question.trivia = await self.trivia_service.generate(question.text)

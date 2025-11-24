@@ -3,5 +3,5 @@ from .enums import *
 
 class VerifyRequestDTO(BaseModel):
     question_id: str
-    answer: str
+    answer: float
     language: Language

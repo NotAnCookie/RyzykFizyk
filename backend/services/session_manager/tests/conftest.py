@@ -39,13 +39,27 @@ def fake_question_generator():
 
 
 
+from types import SimpleNamespace
+import pytest
+from unittest.mock import AsyncMock
+
 @pytest.fixture
 def mock_verify_service():
     verify = AsyncMock()
-    verify.verify = AsyncMock(return_value=type(
-        "VerifyResult", (), {"verified_answer": True, "source": "https://example.com"}
-    )())
+
+    mock_source = SimpleNamespace(
+        title="String",
+        site_name="Wikipedia",
+        url="https://example.com"
+    )
+    mock_result = SimpleNamespace(
+        correct=0,
+        source=mock_source
+    )
+
+    verify.verify = AsyncMock(return_value=mock_result)
     return verify
+
 
 
 @pytest.fixture
