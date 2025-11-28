@@ -51,8 +51,9 @@ def generate_question(category: Category, language: Language = Language.ENG) -> 
             for sentence in sentences:
                 numbers = re.findall(r'\b\d{2,}(?:[.,]\d+)?\b', sentence)
                 
-                if numbers and len(sentence) > 30:
-                    number_to_hide = max(numbers, key=len) 
+                valid_numbers = [n for n in numbers if len(n) < 4]
+                if valid_numbers and len(sentence) > 30:
+                    number_to_hide = min(valid_numbers, key=len) 
                     candidates.append((sentence, number_to_hide))
             
             if not candidates:
