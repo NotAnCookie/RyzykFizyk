@@ -4,8 +4,8 @@ import random
 from typing import Optional
 
 # Importujemy Twoje modele
-from models import Category, Question
-from enums import Language
+from app.services.question_generator.src.models import Category, Question
+from app.services.question_generator.src.enums import Language
 
 def remove_brackets(text: str) -> str:
     """Usuwa przypisy [1] i nawiasy (ur...)"""

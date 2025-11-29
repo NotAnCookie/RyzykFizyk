@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from services.answer_verification.src.verifier import AnswerVerifier
-from services.answer_verification.src.models import VerificationRequest
+from app.services.answer_verification.src.verifier import AnswerVerifier
+from app.services.answer_verification.src.models import VerificationRequest
 
 router = APIRouter(prefix="/verify")
 

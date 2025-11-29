@@ -1,6 +1,6 @@
 from typing import List
 from dataclasses import dataclass, field
-from enums import Language 
+from app.services.question_generator.src.enums import Language 
 import uuid
 
 @dataclass

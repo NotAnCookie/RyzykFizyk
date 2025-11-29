@@ -1,7 +1,7 @@
 import requests
 import yake
 from pathlib import Path
-from services.answer_verification.src.enums import Language
+from app.services.answer_verification.src.enums import Language
 
 
 class WikipediaClient:

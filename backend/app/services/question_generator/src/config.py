@@ -1,4 +1,4 @@
-from models import Category
+from app.services.question_generator.src.models import Category
 
 AVAILABLE_CATEGORIES = [
     Category(
