@@ -11,9 +11,15 @@ router = APIRouter(
 )
 
 CATEGORIES_DB = {
-    f"cat_{i}": category 
+    f"{i}": category 
     for i, category in enumerate(AVAILABLE_CATEGORIES, 1)
 }
+
+@router.get("/categories")
+async def get_categories():
+    return [
+            CATEGORIES_DB
+        ]
 
 @router.get("/generate-quiz", response_model=List[dict]) 
 async def generate_quiz_endpoint(
