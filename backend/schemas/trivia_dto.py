@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from enums import *
+from schemas.enums import *
 from typing import Optional
 
 
