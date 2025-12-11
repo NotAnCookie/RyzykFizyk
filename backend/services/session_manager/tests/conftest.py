@@ -3,18 +3,9 @@ from unittest.mock import AsyncMock, Mock
 
 from services.session_manager.src.session_manager import SessionManager
 from schemas.player import Player
-from schemas.enums import Language, Category
+from schemas.enums import *
 from schemas.question import Question
 
-
-# @pytest.fixture
-# def mock_question_generator():
-#     gen = AsyncMock()
-#     gen.generate = AsyncMock(return_value=[
-#         Question(id=1, text="Q1", category=Category.RANDOM, language=Language.PL),
-#         Question(id=2, text="Q2", category=Category.RANDOM, language=Language.PL),
-#     ])
-#     return gen
 
 @pytest.fixture
 def fake_question_generator():
