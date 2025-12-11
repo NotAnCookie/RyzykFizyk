@@ -1,5 +1,5 @@
 import pytest
-from models import TriviaResult
+from services.trivia_generator.src.models import TriviaResult
 
 def test_build_trivia_result_with_source(trivia_generator):
     # Arrange

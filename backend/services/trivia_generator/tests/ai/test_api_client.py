@@ -1,6 +1,6 @@
 import os
 import pytest
-from communication.api_client import APIClient
+from services.trivia_generator.src.communication.api_client import APIClient
 
 @pytest.mark.ai
 def test_api_client_basic():

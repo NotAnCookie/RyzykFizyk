@@ -1,7 +1,7 @@
 import os
 import pytest
-from communication.api_client import *
-from generator.trivia_generator import *
+from services.trivia_generator.src.communication.api_client import *
+from services.trivia_generator.src.generator.trivia_generator import *
 
 @pytest.mark.ai
 def test_trivia_openai():

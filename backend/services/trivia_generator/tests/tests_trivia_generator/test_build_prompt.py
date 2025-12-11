@@ -32,7 +32,7 @@ def test_build_prompt_selects_pl_template(trivia_generator):
     
     # Assert
     assert topic in prompt
-    assert "Podaj jedną krótką" in prompt 
+    assert "Opowiedz" in prompt 
 
 
 def test_build_prompt_selects_en_template(trivia_generator):
@@ -44,4 +44,4 @@ def test_build_prompt_selects_en_template(trivia_generator):
     
     # Assert
     assert topic in prompt
-    assert "Provide one short" in prompt 
+    assert "Tell" in prompt 

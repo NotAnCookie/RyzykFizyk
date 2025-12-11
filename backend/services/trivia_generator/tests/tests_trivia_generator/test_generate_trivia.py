@@ -1,7 +1,7 @@
 import pytest
-from generator.trivia_generator import TriviaGenerator
-from models import TriviaRequest, TriviaResult, SourceMetadata
-from enums import Language
+from services.trivia_generator.src.generator.trivia_generator import TriviaGenerator
+from services.trivia_generator.src.models import TriviaRequest, TriviaResult, SourceMetadata
+from services.trivia_generator.src.enums import Language
 
 
 def test_generate_trivia_valid_input(trivia_generator):
