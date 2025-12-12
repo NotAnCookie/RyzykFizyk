@@ -52,10 +52,15 @@ export class LandingPageComponent implements OnInit {
       next: (data) => {
         //console.log("Pobrano kategorie z Pythona:", data);
         this.categories = data;
-      },
+        this.categories.unshift({ id: 'x', name: 'Random 🎲' });  
+        this.selectedCategory = this.categories[0].id;
+          },
       error: (err) => {
         //console.error("Błąd pobierania kategorii:", err);
         this.categories = [{ id: 'error', name: 'Błąd połączenia' }];
+        this.categories.unshift({ id: 'x', name: 'Random 🎲' });  
+        this.selectedCategory = this.categories[0].id;
+
       }
     });
   }
@@ -103,6 +108,12 @@ startGame() {
 
   openSettings() {
     this.isSettingsOpen = true;
+  }
+
+  getRandomCategory(): CategoryResponse{
+    
+    const randomIndex = Math.floor(Math.random()*this.categories.length);
+    return this.categories[randomIndex];
   }
 
   // Zwraca listę pytań awaryjnych (gdy backend nie działa)
