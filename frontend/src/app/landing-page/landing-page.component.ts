@@ -116,6 +116,21 @@ startGame() {
     return this.categories[randomIndex];
   }
 
+  handleNextQuestion()
+  {
+    this.currentQuestionIndex++;
+    if(this.currentQuestionIndex < this.questionsList.length)
+    {
+      this.currentQuestion = this.questionsList[this.currentQuestionIndex];
+      this.showAnswerCard = false;
+      this.showQuestionCard = true;
+    }
+    else{
+      this.showAnswerCard = false;
+      this.showGameSummary = true;
+    }
+  }
+
   // Zwraca listę pytań awaryjnych (gdy backend nie działa)
   getMockQuestions(): QuestionResponse[] {
     return [

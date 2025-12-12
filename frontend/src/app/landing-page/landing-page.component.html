@@ -98,8 +98,9 @@
 
 <div *ngIf="showAnswerCard" class="absolute inset-0 z-10 bg-white">
   <app-question-answer-card
+    [question]="currentQuestion!"
     (back)="showAnswerCard=false" 
-  (next) = "showAnswerCard=false; showGameSummary = true">
+  (next) = "handleNextQuestion()"
   ></app-question-answer-card>
 </div>
 

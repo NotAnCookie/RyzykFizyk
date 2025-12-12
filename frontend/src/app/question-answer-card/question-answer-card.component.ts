@@ -1,6 +1,7 @@
 import { Component, Output,Input, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
+import { QuestionResponse } from "../models/question.model";
 
 @Component({
   selector: 'app-question-answer-card',
@@ -10,6 +11,8 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './question-answer-card.component.css'
 })
 export class QuestionAnswerCardComponent {
+
+  @Input() question!: QuestionResponse;
 
   @Output() back = new EventEmitter<void>();
   @Output() next = new EventEmitter<void>();
