@@ -3,12 +3,15 @@ from typing import List
 
 from schemas.questions_dto import GenerateQuizRequestDTO, QuestionItemDTO
 from mappers.question_mapper import domain_to_dto, map_category_enum
-from services.question_generator.src.questions_generator import generate_question
+from services.question_generator.src.questions_generator import QuestionGenerator
 
 router = APIRouter(
     prefix="/questions",
     tags=["Questions"]
 )
+
+# Tworzymy instancję generatora
+question_generator = QuestionGenerator()
 
 @router.post("/generate-quiz")
 async def generate_quiz(request: GenerateQuizRequestDTO):
@@ -22,7 +25,7 @@ async def generate_quiz(request: GenerateQuizRequestDTO):
     while len(generated) < request.amount and attempts < 20:
         attempts += 1
         try:
-            q = generate_question(category_enum, request.language)
+            q = question_generator.generate_question(category_enum, request.language)
 
             if q is None:
                 continue

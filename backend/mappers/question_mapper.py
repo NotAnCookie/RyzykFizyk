@@ -19,3 +19,22 @@ def map_category_enum(enum_value: CategoryEnum):
         return random.choice(list(AVAILABLE_CATEGORIES.values()))
 
     return AVAILABLE_CATEGORIES[enum_value.value]
+
+
+from schemas.question import Question as GlobalQuestion
+from schemas.enums import CategoryEnum as GlobalCategory
+import uuid
+
+def map_generated_question_to_global(q) -> GlobalQuestion:
+    """
+    Mapuje pytanie z generatora (lokalna klasa) na globalny model Question.
+    """
+    return GlobalQuestion(
+        id=int(uuid.uuid4().int >> 64), 
+        text=q.question_text,
+        category=GlobalCategory[q.category.name.upper()],
+        language=q.language,
+        answer=float(q.answer) if q.answer else None,
+        trivia=None,
+        sourceUrl=None
+    )

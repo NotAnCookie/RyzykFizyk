@@ -1,19 +1,18 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 from services.answer_verification.src.enums import *
 
-@dataclass
-class VerificationRequest:
+class VerificationRequest(BaseModel):
     question_text: str
     language: str
     numeric_answer: float
 
-@dataclass
-class SourceMetadata:
+
+class SourceMetadata(BaseModel):
     title: str
     site_name: str
     url: str
 
-@dataclass
-class VerificationResult:
+
+class VerificationResult(BaseModel):
     verified_answer: float
     source: SourceMetadata

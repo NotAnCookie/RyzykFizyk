@@ -20,7 +20,7 @@ CATEGORIES_KEYWORDS = {
         "keywords": ["mammal", "bird", "forest"],
     },
     "technology_space": {
-        "name": "Technology/Space",
+        "name": "Technology_Space",
         "keywords": ["rocket", "engine", "planet"],
     },
 }

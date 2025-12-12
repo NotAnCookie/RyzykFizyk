@@ -43,6 +43,7 @@ def session_to_response_dto(session: GameSession) -> SessionResponseDTO:
     all_questions = None
     if session.state == session.state.SUMMARY:
         all_questions = [question_to_dto(q) for q in session.questions]
+    all_questions = [question_to_dto(q) for q in session.questions]
 
     return SessionResponseDTO(
         session_id=session.id,
