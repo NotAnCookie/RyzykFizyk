@@ -1,14 +1,21 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import List
+from pydantic import BaseModel
 
 from schemas.questions_dto import GenerateQuizRequestDTO, QuestionItemDTO
 from mappers.question_mapper import domain_to_dto, map_category_enum
 from services.question_generator.src.questions_generator import QuestionGenerator
+from services.question_generator.src.categories import AVAILABLE_CATEGORIES
+import random
 
 router = APIRouter(
     prefix="/questions",
     tags=["Questions"]
 )
+
+class CategoryResponse(BaseModel):
+    id: str
+    name: str
 
 # Tworzymy instancję generatora
 question_generator = QuestionGenerator()
@@ -16,8 +23,17 @@ question_generator = QuestionGenerator()
 @router.post("/generate-quiz")
 async def generate_quiz(request: GenerateQuizRequestDTO):
 
-    #category = map_category_enum(request.category)
-    category_enum = request.category
+    target_category_id = request.category
+    if request.category == 'random':
+        available_keys = list(AVAILABLE_CATEGORIES.keys())
+        if available_keys:
+            target_category_id = random.choice(available_keys)
+            #print(f"DEBUG: Wylosowano kategorię: {target_category_id}")
+
+    if target_category_id not in AVAILABLE_CATEGORIES:
+        raise HTTPException(status_code=404, detail=f"Category '{request.category}' not found")
+
+    category_enum = AVAILABLE_CATEGORIES[target_category_id]
 
     generated = []
     attempts = 0
@@ -51,6 +67,26 @@ async def generate_quiz(request: GenerateQuizRequestDTO):
         raise HTTPException(status_code=500, detail="Failed to generate quiz")
 
     return generated
+
+@router.get("/categories", response_model=List[CategoryResponse])
+async def get_categories():
+    print("DEBUG: Generowanie listy kategorii...") # Zobaczysz to w terminalu
+    
+    clean_list = []
+    
+    # Iterujemy po słowniku i wyciągamy z niego to co potrzebne
+    for key, data in AVAILABLE_CATEGORIES.items():
+        
+        # Tworzymy prosty obiekt
+        new_item = {
+            "id": str(key),      # np. "1"
+            "name": data.name    # np. "Geography"
+        }
+        
+        clean_list.append(new_item)
+    
+    print(f"DEBUG: Wysyłam {len(clean_list)} kategorii.")
+    return clean_list
 
 # @router.post("/generate", response_model=List[QuestionItemDTO])
 # async def generate_quiz(request: GenerateQuizRequestDTO):

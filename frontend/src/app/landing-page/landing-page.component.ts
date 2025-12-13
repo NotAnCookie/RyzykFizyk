@@ -49,12 +49,37 @@ export class LandingPageComponent implements OnInit {
 
   loadCategories() {
     this.quizService.getCategories().subscribe({
-      next: (data) => {
-        //console.log("Pobrano kategorie z Pythona:", data);
-        this.categories = data;
-        this.categories.unshift({ id: 'x', name: 'Random 🎲' });  
-        this.selectedCategory = this.categories[0].id;
-          },
+next: (data: any[]) => { // Używamy any[], żeby TypeScript nie krzyczał przy naprawianiu
+        
+        console.log("Surowe dane z Pythona:", data);
+
+        let cleanCategories: CategoryResponse[] = [];
+
+        if (data.length > 0 && !data[0].name) {
+          console.warn("Wykryto zagnieżdżone dane! Uruchamiam naprawę...");
+          
+          const rawObject = data[0]; 
+          
+          cleanCategories = Object.keys(rawObject).map(key => {
+             return {
+               id: key,                 
+               name: rawObject[key].name 
+             };
+          });
+
+        } else {
+          cleanCategories = data;
+        }
+        this.categories = [
+          { id: 'random', name: 'Random 🎲' },
+          ...cleanCategories
+        ];
+
+        if (this.categories.length > 0) {
+          this.selectedCategory = this.categories[0].id;
+        }
+
+      },
       error: (err) => {
         //console.error("Błąd pobierania kategorii:", err);
         this.categories = [{ id: 'error', name: 'Błąd połączenia' }];

@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import os
 from services.question_generator.src.questions_generator import QuestionGenerator
 from services.trivia_generator.src.generator.trivia_generator import TriviaGenerator
+from fastapi.middleware.cors import CORSMiddleware
 
 # Generator pytań
 question_generator = QuestionGenerator()
@@ -19,6 +20,18 @@ load_dotenv()
 
 app = FastAPI(title="Quiz Backend")
 
+origins = [
+    "http://localhost:4200",
+    "http://127.0.0.1:4200",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,      # Lista dozwolonych adresów (nasz frontend)
+    allow_credentials=True,
+    allow_methods=["*"],        # Pozwalamy na wszystkie metody (GET, POST, OPTIONS itp.)
+    allow_headers=["*"],        # Pozwalamy na wszystkie nagłówki
+)
 
 verify_service = AnswerVerifier()
 

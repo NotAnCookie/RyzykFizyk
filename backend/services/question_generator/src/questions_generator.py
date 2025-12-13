@@ -77,9 +77,9 @@ class QuestionGenerator:
                     language=language,
                     question_text=question_text.strip(),
                     topic=title,
-                    answer=answer
-                )
+                    answer=answer,
 
+                )
                 return question_obj
 
             except (wikipedia.DisambiguationError, wikipedia.PageError):

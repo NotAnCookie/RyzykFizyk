@@ -26,6 +26,8 @@ export class QuestionAnswerCardComponent {
     source: "https://www.toureiffel.paris",
     sourceDisplay: "toureiffel.paris"
   };
+  @Input() currentQuestionIndex: number = 0;
+  @Input() totalQuestions: number = 0;
 
   handleBack() 
   {

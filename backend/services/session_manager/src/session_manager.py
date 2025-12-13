@@ -82,7 +82,7 @@ class SessionManager:
 
     async def submit_answer(self, session_id: int, answer: PlayerAnswer):
         # pobranie sesji
-        session = self.sessions.get(session_id)
+        session = self.sessions.get(session_id)   
         if session is None:
             raise KeyError(f"Session {session_id} not found")
 
