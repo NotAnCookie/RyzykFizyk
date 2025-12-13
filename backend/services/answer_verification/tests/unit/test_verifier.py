@@ -55,5 +55,23 @@ def test_verify_returns_empty_result_when_no_summary(answer_verifier, wikipedia_
     assert result.source is None
     assert result.verified_answer is None
 
+def test_verify_returns_empty_when_page_not_found(answer_verifier, wikipedia_mock):
+    # ARRANGE
+    wikipedia_mock.search_page.return_value = None
+
+    req = VerificationRequest(
+        question_text="Unknown question",
+        language="EN",
+        numeric_answer=42
+    )
+
+    # ACT
+    result = answer_verifier.verify(req)
+
+    # ASSERT
+    assert result.verified_answer is None
+    assert result.source is None
+
+
 
 

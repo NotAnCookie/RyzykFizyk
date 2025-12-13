@@ -10,7 +10,6 @@ class AnswerVerifier:
     def verify(self, request: VerificationRequest) -> VerificationResult:
         wiki = self.wikipedia_client or WikipediaClient(
             language = Language(request.language)
-            #language=Language.PL if request.language == Language.PL else Language.ENG
         )
         print(f"{request.language}")
 
