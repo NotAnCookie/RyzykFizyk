@@ -19,13 +19,6 @@ export class QuestionCardComponent {
   @Output() back = new EventEmitter<void>();
   @Output() next = new EventEmitter<void>();
 
-  // Na razie jakiekolwiek pytanie
-  /*question = 
-  {
-    text: "How tall is the Eiffel Tower?",
-    category: "Geography",
-  };*/
-
   handleBack() 
   {
     this.back.emit();

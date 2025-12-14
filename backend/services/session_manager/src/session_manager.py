@@ -17,12 +17,18 @@ class SessionManager:
         # aktywne sesje
         self.sessions: dict[int, GameSession] = {}
 
-    def create_session(self, player: Player, language: Language, category: CategoryEnum) -> GameSession:
+    def create_session(self, player: Player, language: Language, category_id: str) -> GameSession:
+
+        if category_id not in AVAILABLE_CATEGORIES:
+            raise ValueError(f"Category ID  {category_id} not found")
+        
+        category_obj = AVAILABLE_CATEGORIES[category_id]
+
         session = GameSession(
             id=len(self.sessions) + 1,
             player=player,
             language=language,
-            category=category,
+            category=category_obj,
             questions=[],
             answers=[],
             currentQuestion=-1,
@@ -38,7 +44,7 @@ class SessionManager:
 
         # generujemy pierwsze pytanie
         generated_q = self.question_generator.generate_question(
-            category_enum=session.category,
+            category=session.category,
             language=session.language
         )
 
@@ -63,7 +69,7 @@ class SessionManager:
         if indx < MAX_QUESTIONS:
             new_generated_q = self.question_generator.generate_question(
                 language=session.language,
-                category_enum=session.category
+                category=session.category
             )
 
             if new_generated_q:
@@ -78,7 +84,28 @@ class SessionManager:
         session.state = SessionState.SUMMARY
         return None
 
+    async def generate_background_question(self, session_id: int):
+        session = self.sessions.get(session_id)
+        if not session:
+            raise KeyError(f"Session {session_id} not found")
 
+        # Generujemy pytanie używając obiektu kategorii z sesji
+        new_generated_q = self.question_generator.generate_question(
+            category=session.category, 
+            language=session.language
+        )
+
+        if new_generated_q:
+            # Mapujemy na globalny model
+            new_question = map_generated_question_to_global(new_generated_q)
+            # Ustawiamy ID na "długość listy + 1", czyli na koniec kolejki
+            new_question.id = len(session.questions) + 1 
+
+            session.questions.append(new_question)
+            
+            return new_question
+        
+        return None
 
     async def submit_answer(self, session_id: int, answer: PlayerAnswer):
         # pobranie sesji

@@ -9,7 +9,7 @@ def domain_to_dto(question: Question) -> QuestionItemDTO:
         question_id=question.question_id,
         category=question.category.name,
         topic=question.topic,
-        question_text=question.question_text,
+        text=question.text,
         answer=question.answer,
         language=question.language.value
     )
@@ -32,6 +32,7 @@ def map_generated_question_to_global(q) -> GlobalQuestion:
     return GlobalQuestion(
         id=int(uuid.uuid4().int >> 64), 
         text=q.question_text,
+        topic=q.topic,
         category=GlobalCategory[q.category.name.upper()],
         language=q.language,
         answer=float(q.answer) if q.answer else None,

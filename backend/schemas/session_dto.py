@@ -1,18 +1,20 @@
 # schemas/session_dto.py
 from pydantic import BaseModel
 from typing import Optional, List
-from schemas.enums import Language, Category
+from schemas.enums import Language
 
 class CreateSessionDTO(BaseModel):
     player_id: int
     player_name: str
     player_email: str
     language: Language
-    category: Category
+    category: str
 
 class QuestionDTO(BaseModel):
     id: int
     text: str
+    topic: str
+    category: str
     trivia: Optional[str] = None
     sourceUrl: Optional[str] = None
 

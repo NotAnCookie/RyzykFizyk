@@ -5,6 +5,7 @@ from typing import Optional
 class Question(BaseModel):
     id: int
     text: str
+    topic: str
     category: Category
     language: Language
     answer: Optional[float] = None

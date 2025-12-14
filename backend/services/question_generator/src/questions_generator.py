@@ -39,17 +39,21 @@ class QuestionGenerator:
             return None
 
     def generate_question(
-        self, category_enum: CategoryEnum, language: Language = Language.EN
+        self, category, language: Language = Language.EN
     ) -> Optional[Question]:
         wikipedia.set_lang(language.value)
-        category = self.resolve_category(category_enum)
 
         attempts = 0
         while attempts < 5:
             attempts += 1
-            title = self.find_article_title(category)
-            if not title:
-                continue
+
+            if not category.keywords:
+                print("DEBUG: Keyword list empty")
+                return None
+        
+            keyword = random.choice(category.keywords)
+            search_results = wikipedia.search(keyword)
+            title = random.choice(search_results)    
 
             try:
                 page = wikipedia.page(title, auto_suggest=False)

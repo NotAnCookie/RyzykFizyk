@@ -42,6 +42,7 @@ export class LandingPageComponent implements OnInit {
   questionsList: QuestionResponse[] = [];
   currentQuestionIndex: number = 0;
   currentQuestion: QuestionResponse | null = null
+  sessionID: number|null = null;
 
   ngOnInit(): void {
     this.loadCategories();
@@ -49,7 +50,7 @@ export class LandingPageComponent implements OnInit {
 
   loadCategories() {
     this.quizService.getCategories().subscribe({
-next: (data: any[]) => { // Używamy any[], żeby TypeScript nie krzyczał przy naprawianiu
+    next: (data: any[]) => { // Używamy any[], żeby TypeScript nie krzyczał przy naprawianiu
         
         console.log("Surowe dane z Pythona:", data);
 
@@ -96,26 +97,52 @@ startGame() {
       return;
     }
 
+    this.questionsList = [];     
+    this.currentQuestion = null;
+    this.currentQuestionIndex = 0;
+    this.showGameSummary = false;    
+    this.showQuestionCard = false; 
+
     this.showQuestionCard = true;
 
-    this.quizService.getQuiz(this.selectedCategory).subscribe({
-      next: (data) => {
-        // SCENARIUSZ POZYTYWNY: Mamy dane z Pythona
-        console.log("Pobrano quiz z serwera");
-        this.questionsList = data;
-        this.finalizeGameStart();
-      },
-      error: (err) => {
-        // SCENARIUSZ NEGATYWNY: Błąd serwera -> Ładujemy Mock Data
-        console.warn("Błąd backendu. Ładowanie pytań awaryjnych (offline mode).", err);
-        
-        this.questionsList = this.getMockQuestions(); // <--- TU JEST KLUCZOWA ZMIANA
-        this.finalizeGameStart();
+  this.quizService.createSession("Player1", this.selectedCategory, 'en').subscribe({
+    next: (response: any) => {
+
+      this.questionsList = [response.current_question]; 
+      this.currentQuestion = response.current_question;
+      this.currentQuestionIndex = 0;
+      this.showQuestionCard = true; 
+      this.sessionID = response.session_id;
+
+      if(this.sessionID){
+        this.loadQuestions(this.sessionID, 6);
       }
-    });
+    },
+    error: (err) => {
+      console.error("Błąd startu:", err);
+      // Fallback do mocków (opcjonalnie)
+      this.questionsList = this.getMockQuestions();
+      if(this.questionsList.length > 0) {
+          this.currentQuestion = this.questionsList[0];
+          this.currentQuestionIndex = 0;
+          this.showQuestionCard = true;
+      }
+    }
+  });
   }
 
-  // Wydzieliłem to do osobnej funkcji, żeby nie powtarzać kodu w 'next' i 'error'
+
+  loadQuestions(sessionId: number, count: number) {
+    for (let i = 0; i < count; i++) {
+      this.quizService.generateBackgroundQuestion(sessionId).subscribe({
+        next: (nextQ) => {
+          this.questionsList.push(nextQ);
+        },
+        error: (e) => console.error("Błąd tła:", e)
+      });
+    }
+  }
+
   finalizeGameStart() {
     this.currentQuestionIndex = 0;
     this.loadCurrentQuestion();
@@ -143,17 +170,41 @@ startGame() {
 
   handleNextQuestion()
   {
-    this.currentQuestionIndex++;
-    if(this.currentQuestionIndex < this.questionsList.length)
-    {
-      this.currentQuestion = this.questionsList[this.currentQuestionIndex];
-      this.showAnswerCard = false;
-      this.showQuestionCard = true;
-    }
-    else{
-      this.showAnswerCard = false;
-      this.showGameSummary = true;
-    }
+    if (this.currentQuestionIndex < 6) {     
+        this.currentQuestionIndex++;
+        this.showAnswerCard = false;
+        this.showQuestionCard = true;
+        // Zabezpieczenie: Czy generator w tle zdążył?
+        if (this.questionsList[this.currentQuestionIndex]) {
+          this.currentQuestion = this.questionsList[this.currentQuestionIndex];
+        } 
+        else {
+          this.currentQuestionIndex--; 
+        }
+      }
+    else {
+       this.finishGame();
+      }
+  }
+
+  finishGame()
+  {
+    this.showQuestionCard = false;
+    this.showAnswerCard = false;
+    this.showGameSummary = true;
+    this.quizService.endSession().subscribe(); 
+
+  }
+
+  backToMenu() {
+  this.quizService.endSession().subscribe(); 
+
+  this.showGameSummary = false;
+  this.showQuestionCard = false;
+  this.showAnswerCard = false;
+  this.questionsList = []; 
+  this.currentQuestionIndex = 0;
+  this.selectedCategory = ""; 
   }
 
   // Zwraca listę pytań awaryjnych (gdy backend nie działa)
@@ -163,7 +214,7 @@ startGame() {
         question_id: '1',
         category: 'Demo',
         topic: 'Angular',
-        question_text: 'Angular jest frameworkiem stworzonym przez firmę [???].',
+        text: 'Angular jest frameworkiem stworzonym przez firmę [???].',
         answer: 'Google',
         language: 'pl'
       },
@@ -171,7 +222,7 @@ startGame() {
         question_id: '2',
         category: 'Demo',
         topic: 'Układ Słoneczny',
-        question_text: 'Największą planetą w Układzie Słonecznym jest [???].',
+        text: 'Największą planetą w Układzie Słonecznym jest [???].',
         answer: 'Jowisz',
         language: 'pl'
       },
@@ -179,7 +230,7 @@ startGame() {
         question_id: '3',
         category: 'Demo',
         topic: 'Matematyka',
-        question_text: 'Liczba Pi w przybliżeniu wynosi 3,[???].',
+        text: 'Liczba Pi w przybliżeniu wynosi 3,[???].',
         answer: '14',
         language: 'pl'
       },
@@ -187,7 +238,7 @@ startGame() {
         question_id: '4',
         category: 'Demo',
         topic: 'Historia Polski',
-        question_text: 'Chrzest Polski odbył się w roku [???].',
+        text: 'Chrzest Polski odbył się w roku [???].',
         answer: '966',
         language: 'pl'
       },
@@ -195,7 +246,7 @@ startGame() {
         question_id: '5',
         category: 'Demo',
         topic: 'Chemia',
-        question_text: 'Symbol chemiczny złota to [???].',
+        text: 'Symbol chemiczny złota to [???].',
         answer: 'Au',
         language: 'pl'
       },
@@ -203,7 +254,7 @@ startGame() {
         question_id: '6',
         category: 'Demo',
         topic: 'Biologia',
-        question_text: 'Dorosły człowiek ma zazwyczaj [???] zęby (wliczając ósemki).',
+        text: 'Dorosły człowiek ma zazwyczaj [???] zęby (wliczając ósemki).',
         answer: '32',
         language: 'pl'
       },
@@ -211,7 +262,7 @@ startGame() {
         question_id: '7',
         category: 'Demo',
         topic: 'Geografia',
-        question_text: 'Stolicą Francji jest [???].',
+        text: 'Stolicą Francji jest [???].',
         answer: 'Paryż',
         language: 'pl'
       }

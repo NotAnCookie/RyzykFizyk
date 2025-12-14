@@ -11,6 +11,8 @@ def question_to_dto(q) -> QuestionDTO:
     return QuestionDTO(
         id=q.id,
         text=q.text,
+        topic=q.topic,
+        category=q.category.name if hasattr(q.category, 'name') else str(q.category),
         trivia=q.trivia,
         sourceUrl=q.sourceUrl
     )

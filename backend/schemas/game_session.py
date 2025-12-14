@@ -3,6 +3,7 @@ from schemas.enums import *
 from typing import Optional
 from schemas.player import *
 from schemas.question import *
+from services.question_generator.src.categories import WikiCategory
 
 MAX_QUESTIONS = 7
 
@@ -13,6 +14,6 @@ class GameSession(BaseModel):
     answers: list[PlayerAnswer]
     currentQuestion: int
     language: Language
-    category: Category
+    category: WikiCategory
     state: SessionState
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Cookie, Response
+from fastapi import APIRouter, HTTPException, Cookie, Response, Body
 from schemas.session_dto import *
 from mappers.session_mapper import *
 from services.session_manager.src.session_manager import SessionManager
@@ -19,15 +19,6 @@ def get_session_router(session_manager):
         
         return session_to_initial_question_dto(session)
 
-
-    @router.get("/current_question", response_model=QuestionDTO)
-    async def get_current_question(session_id: int = Cookie(...)):
-        try:
-            session = session_manager.sessions[session_id]
-        except KeyError:
-            raise HTTPException(status_code=404, detail="Session not found")
-        return session_to_current_question_dto(session)
-
     @router.post("/next_question", response_model=QuestionDTO)
     async def next_question(session_id: int = Cookie(...)):
         try:
@@ -35,6 +26,18 @@ def get_session_router(session_manager):
         except KeyError:
             raise HTTPException(status_code=404, detail="Session not found")
         return question_to_dto(question) if question else None
+    
+    @router.post("/generate-background")
+    async def generate_background_question(session_id: int = Body(..., embed=True)):
+        try:
+            new_question = await session_manager.generate_background_question(session_id)
+            if new_question:
+                # Zwracamy DTO, żeby frontend mógł je sobie dodać do listy
+                return question_to_dto(new_question)
+            raise HTTPException(status_code=500, detail="Generation failed")
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
 
     @router.post("/submit_answer", response_model=QuestionDTO)
     async def submit_answer(dto: PlayerAnswerDTO, session_id: int = Cookie(...)):
@@ -44,6 +47,14 @@ def get_session_router(session_manager):
 
             await session_manager.submit_answer(session_id, answer)
 
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Session not found")
+        return session_to_current_question_dto(session)
+    
+    @router.get("/current_question", response_model=QuestionDTO)
+    async def get_current_question(session_id: int = Cookie(...)):
+        try:
+            session = session_manager.sessions[session_id]
         except KeyError:
             raise HTTPException(status_code=404, detail="Session not found")
         return session_to_current_question_dto(session)

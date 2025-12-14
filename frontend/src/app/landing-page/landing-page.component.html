@@ -89,12 +89,12 @@
  </div>
 </div>
 
-<div *ngIf="showQuestionCard" class="absolute inset-0 z-10 bg-white">
+<div *ngIf="showQuestionCard && currentQuestion" class="absolute inset-0 z-10 bg-white">
   <app-question-card 
   [question]="currentQuestion!"
   [currentQuestionIndex] = "currentQuestionIndex + 1"
   [totalQuestions] = "questionsList.length"
-  (back)="showQuestionCard=false" 
+  (back)="backToMenu()"
   (next) = "showAnswerCard=true; showQuestionCard=false">
 </app-question-card>
 </div>
@@ -104,14 +104,14 @@
     [question]="currentQuestion!"
     [currentQuestionIndex] = "currentQuestionIndex + 1"
     [totalQuestions] = "questionsList.length"
-    (back)="showAnswerCard=false" 
-  (next) = "handleNextQuestion()"
+    (back)="backToMenu()"
+    (next) = "handleNextQuestion()"
   ></app-question-answer-card>
 </div>
 
 <div *ngIf="showGameSummary" class="absolute inset-0 z-10 bg-white">
   <app-game-summary
-    (back)="showGameSummary=false" 
+    (back)="backToMenu()"
     (playAgain) = "showGameSummary = false">
   </app-game-summary>
 </div>
