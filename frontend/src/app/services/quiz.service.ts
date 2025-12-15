@@ -69,6 +69,14 @@ createSession(playerName: string, category: string, lang: string): Observable<an
     return this.http.post(`${this.sessionUrl}/generate-background`, body, { withCredentials: true });
   }
 
+  verifyAnswer(questionId: string | number, answerValue: number): Observable<any> {
+      const body = {
+          question_id: questionId,
+          value: answerValue
+      };
+      return this.http.post(`${this.sessionUrl}/verify_answer`, body, { withCredentials: true });
+  }
+
   // Pomocnicze: Pobierz aktualne pytanie (np. jak odświeżysz stronę)
   getCurrentQuestion(): Observable<any> {
     return this.http.get(`${this.sessionUrl}/current_question`, { withCredentials: true });

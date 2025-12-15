@@ -8,6 +8,7 @@ import { QuestionAnswerCardComponent } from '../question-answer-card/question-an
 import { GameSummaryComponent } from '../game-summary/game-summary.component';
 import { QuizService, CategoryResponse } from '../services/quiz.service';
 import { QuestionResponse } from '../models/question.model';
+import { producerUpdatesAllowed } from '@angular/core/primitives/signals';
 
 @Component({
   selector: 'app-landing-page',
@@ -43,6 +44,7 @@ export class LandingPageComponent implements OnInit {
   currentQuestionIndex: number = 0;
   currentQuestion: QuestionResponse | null = null
   sessionID: number|null = null;
+  answerData: any = null;
 
   ngOnInit(): void {
     this.loadCategories();
@@ -121,7 +123,7 @@ startGame() {
     error: (err) => {
       console.error("Błąd startu:", err);
       // Fallback do mocków (opcjonalnie)
-      this.questionsList = this.getMockQuestions();
+      //this.questionsList = this.getMockQuestions();
       if(this.questionsList.length > 0) {
           this.currentQuestion = this.questionsList[0];
           this.currentQuestionIndex = 0;
@@ -168,23 +170,56 @@ startGame() {
     return this.categories[randomIndex];
   }
 
-  handleNextQuestion()
-  {
-    if (this.currentQuestionIndex < 6) {     
+  showAnswer() {
+    this.quizService.verifyAnswer(this.currentQuestion!.id, 111)
+      .subscribe({
+        next: (updatedQuestion) => {
+
+            if (this.questionsList[this.currentQuestionIndex]) {
+               this.questionsList[this.currentQuestionIndex] = updatedQuestion;
+            }
+            this.currentQuestion = updatedQuestion;
+
+           this.answerData = {
+               question: updatedQuestion.text,
+               correctAnswer: updatedQuestion.answer, 
+               userAnswer: 111,
+               source: updatedQuestion.sourceUrl,
+               trivia: updatedQuestion.trivia
+           };
+           this.showAnswerCard = true;
+        },
+        error: (err) => console.error("Błąd weryfikacji:", err)
+      });
+}
+
+
+  handleNextQuestion() {
+    if (this.currentQuestionIndex >= 6) { 
+       this.finishGame();
+       return;
+    }
+    this.quizService.getNextQuestion().subscribe({
+      next: (nextQuestionFromBackend) => {
+        console.log("⏩ Backend potwierdził zmianę. Nowe pytanie:", nextQuestionFromBackend);
+
         this.currentQuestionIndex++;
+        
+        this.currentQuestion = nextQuestionFromBackend;
+        if (!this.questionsList[this.currentQuestionIndex]) {
+           this.questionsList.push(nextQuestionFromBackend);
+        } else {
+           this.questionsList[this.currentQuestionIndex] = nextQuestionFromBackend;
+        }
+
         this.showAnswerCard = false;
         this.showQuestionCard = true;
-        // Zabezpieczenie: Czy generator w tle zdążył?
-        if (this.questionsList[this.currentQuestionIndex]) {
-          this.currentQuestion = this.questionsList[this.currentQuestionIndex];
-        } 
-        else {
-          this.currentQuestionIndex--; 
-        }
+      },
+      error: (err) => {
+        console.error("Błąd przesuwania pytania:", err);
+
       }
-    else {
-       this.finishGame();
-      }
+    });
   }
 
   finishGame()
@@ -208,10 +243,10 @@ startGame() {
   }
 
   // Zwraca listę pytań awaryjnych (gdy backend nie działa)
-  getMockQuestions(): QuestionResponse[] {
+ /* getMockQuestions(): QuestionResponse[] {
     return [
       {
-        question_id: '1',
+        id: 1,
         category: 'Demo',
         topic: 'Angular',
         text: 'Angular jest frameworkiem stworzonym przez firmę [???].',
@@ -219,7 +254,7 @@ startGame() {
         language: 'pl'
       },
       {
-        question_id: '2',
+        id: 2,
         category: 'Demo',
         topic: 'Układ Słoneczny',
         text: 'Największą planetą w Układzie Słonecznym jest [???].',
@@ -227,7 +262,7 @@ startGame() {
         language: 'pl'
       },
       {
-        question_id: '3',
+        id: 3,
         category: 'Demo',
         topic: 'Matematyka',
         text: 'Liczba Pi w przybliżeniu wynosi 3,[???].',
@@ -235,7 +270,7 @@ startGame() {
         language: 'pl'
       },
       {
-        question_id: '4',
+        id: 4,
         category: 'Demo',
         topic: 'Historia Polski',
         text: 'Chrzest Polski odbył się w roku [???].',
@@ -243,7 +278,7 @@ startGame() {
         language: 'pl'
       },
       {
-        question_id: '5',
+        id: 5,
         category: 'Demo',
         topic: 'Chemia',
         text: 'Symbol chemiczny złota to [???].',
@@ -251,7 +286,7 @@ startGame() {
         language: 'pl'
       },
       {
-        question_id: '6',
+        id: 6,
         category: 'Demo',
         topic: 'Biologia',
         text: 'Dorosły człowiek ma zazwyczaj [???] zęby (wliczając ósemki).',
@@ -259,7 +294,7 @@ startGame() {
         language: 'pl'
       },
       {
-        question_id: '7',
+        id: 7,
         category: 'Demo',
         topic: 'Geografia',
         text: 'Stolicą Francji jest [???].',
@@ -267,5 +302,5 @@ startGame() {
         language: 'pl'
       }
     ];
-  }
+  }*/
 }

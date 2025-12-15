@@ -1,8 +1,11 @@
 export interface QuestionResponse {
-  question_id: string;
+  id: number;
   category: string;
   topic: string;         
   text: string;  
   answer: string;         
-  language: string;      
+  language: string;
+  trivia: string |null;
+  sourceUrl: string|null;
+
 }

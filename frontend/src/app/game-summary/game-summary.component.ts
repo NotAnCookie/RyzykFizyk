@@ -1,5 +1,7 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { QuestionResponse } from "../models/question.model";
+
 
 @Component({
   selector: 'app-game-summary',
@@ -9,12 +11,13 @@ import { CommonModule } from '@angular/common';
   styleUrl: './game-summary.component.css'
 })
 export class GameSummaryComponent {
+  @Input() questions: QuestionResponse[] = [];
 
   @Output() back = new EventEmitter<void>();
   @Output() playAgain = new EventEmitter<void>();
 
   // przykładowe dane!!!!
-  questions = [
+  /*questions = [
     {
       id: 1,
       question: "How many countries are there in the world?",
@@ -50,7 +53,7 @@ export class GameSummaryComponent {
       question: "What is the speed of light in km/s (rounded)?",
       correctAnswer: "300000"
     }
-  ];
+  ];*/
 
   handleBack() {
     this.back.emit();

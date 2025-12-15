@@ -15,6 +15,7 @@ class QuestionDTO(BaseModel):
     text: str
     topic: str
     category: str
+    answer: Optional[float] = None
     trivia: Optional[str] = None
     sourceUrl: Optional[str] = None
 

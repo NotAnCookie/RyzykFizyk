@@ -95,7 +95,7 @@
   [currentQuestionIndex] = "currentQuestionIndex + 1"
   [totalQuestions] = "questionsList.length"
   (back)="backToMenu()"
-  (next) = "showAnswerCard=true; showQuestionCard=false">
+  (next) = "showAnswerCard=true; showQuestionCard=false; showAnswer()">
 </app-question-card>
 </div>
 
@@ -103,7 +103,6 @@
   <app-question-answer-card
     [question]="currentQuestion!"
     [currentQuestionIndex] = "currentQuestionIndex + 1"
-    [totalQuestions] = "questionsList.length"
     (back)="backToMenu()"
     (next) = "handleNextQuestion()"
   ></app-question-answer-card>
@@ -111,6 +110,7 @@
 
 <div *ngIf="showGameSummary" class="absolute inset-0 z-10 bg-white">
   <app-game-summary
+    [questions] = "questionsList"
     (back)="backToMenu()"
     (playAgain) = "showGameSummary = false">
   </app-game-summary>

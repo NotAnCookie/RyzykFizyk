@@ -38,6 +38,26 @@ def get_session_router(session_manager):
         except KeyError:
             raise HTTPException(status_code=404, detail="Session not found")
         
+    
+    @router.post("/verify_answer", response_model=QuestionDTO)
+    async def verify_answer(
+        dto: PlayerAnswerDTO,         
+        session_id: int = Cookie(...)
+    ):
+        try:
+            await session_manager.verify_only(
+                session_id=session_id, 
+                user_value=dto.value, 
+                question_id=dto.question_id
+            )
+            
+            session = session_manager.sessions[session_id]
+            
+            return session_to_current_question_dto(session)
+
+        except KeyError:
+            raise HTTPException(status_code=404, detail="Session or question not found")
+        
 
     @router.post("/submit_answer", response_model=QuestionDTO)
     async def submit_answer(dto: PlayerAnswerDTO, session_id: int = Cookie(...)):

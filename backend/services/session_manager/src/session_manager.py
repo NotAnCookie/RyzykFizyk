@@ -106,6 +106,29 @@ class SessionManager:
             return new_question
         
         return None
+    
+    async def verify_only(self, session_id: int, user_value: float, question_id: int):
+        session = self.sessions.get(session_id)
+        if not session:
+            raise KeyError("Session not found")
+
+        # 1. Znajdź pytanie
+        question = next((q for q in session.questions if q.id == question_id), None)
+        if not question:
+            raise KeyError("Question not found")
+        verify_request = VerificationRequest(
+            question_text=question.text,
+            numeric_answer=user_value,
+            language=session.language
+        )
+
+        result = await asyncio.to_thread(self.verify_service.verify, verify_request)
+
+        if result.source:
+            question.sourceUrl = result.source.url # Link do źródła
+        
+        # Zwracamy wynik, żeby router mógł go odesłać
+        return result
 
     async def submit_answer(self, session_id: int, answer: PlayerAnswer):
         # pobranie sesji
