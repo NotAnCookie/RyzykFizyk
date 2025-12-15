@@ -73,10 +73,11 @@ export class LandingPageComponent implements OnInit {
         } else {
           cleanCategories = data;
         }
-        this.categories = [
+        /*this.categories = [
           { id: 'random', name: 'Random 🎲' },
           ...cleanCategories
-        ];
+        ];*/
+        this.categories = cleanCategories;
 
         if (this.categories.length > 0) {
           this.selectedCategory = this.categories[0].id;
@@ -86,7 +87,7 @@ export class LandingPageComponent implements OnInit {
       error: (err) => {
         //console.error("Błąd pobierania kategorii:", err);
         this.categories = [{ id: 'error', name: 'Błąd połączenia' }];
-        this.categories.unshift({ id: 'x', name: 'Random 🎲' });  
+       // this.categories.unshift({ id: 'x', name: 'Random 🎲' });  
         this.selectedCategory = this.categories[0].id;
 
       }
