@@ -9,19 +9,19 @@ class WikiCategory(BaseModel):
 CATEGORIES_KEYWORDS = {
     "geography": {
         "name": "Geography",
-        "keywords": ["river", "lake", "mountain", "island"],
+         "keywords": ["river", "lake", "mountain peak", "mountain", "island", "desert", "city", "capital", "ocean", "volcano", "strait"]
     },
     "history": {
         "name": "History",
-        "keywords": ["battle", "king", "dynasty"],
+        "keywords": ["battle", "war", "king", "treaty", "uprising", "dynasty", "revolution", "castle", "emperor"],
     },
     "biology": {
         "name": "Biology",
-        "keywords": ["mammal", "bird", "forest"],
+        "keywords": ["mammal", "bird", "reptile", "anatomy", "tree", "forest", "bacteria", "organism", "species"],
     },
     "technology_space": {
         "name": "Technology_Space",
-        "keywords": ["rocket", "engine", "planet"],
+        "keywords": ["planet", "rocket", "airplane", "engine", "element", "star", "computer", "invention", "energy"],
     },
 }
 
