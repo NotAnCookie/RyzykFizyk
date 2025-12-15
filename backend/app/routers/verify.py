@@ -18,3 +18,24 @@ def verify_endpoint(request: VerifyRequestDTO):
         "correct": result.verified_answer,
         "source": result.source
     }
+
+@router.post("/google")
+def verify_google_endpoint(request: VerifyRequestDTO):
+    domain_request = dto_to_domain(request)
+    result = verifier.verify_google(domain_request)
+
+    return {
+        "correct": result.verified_answer,
+        "source": result.source
+    }
+
+@router.post("/wikipedia")
+def verify_wikipedia_endpoint(request: VerifyRequestDTO):
+    domain_request = dto_to_domain(request)
+    result = verifier.verify_wikipedia(domain_request)
+
+    return {
+        "correct": result.verified_answer,
+        "source": result.source
+    }
+

@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from services.answer_verification.src.enums import *
+from typing import Optional
 
 class VerificationRequest(BaseModel):
     question_text: str
@@ -14,5 +15,5 @@ class SourceMetadata(BaseModel):
 
 
 class VerificationResult(BaseModel):
-    verified_answer: float
-    source: SourceMetadata
+    verified_answer: Optional[float] = None
+    source: Optional[SourceMetadata] = None
