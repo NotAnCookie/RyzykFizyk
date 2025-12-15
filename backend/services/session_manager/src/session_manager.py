@@ -48,7 +48,11 @@ class SessionManager:
             language=session.language
         )
 
-        session.questions = [map_generated_question_to_global(generated_q)]
+        
+        first_question = map_generated_question_to_global(generated_q)
+        first_question.id = len(session.questions) + 1
+
+        session.questions.append(first_question)
 
         session.state = SessionState.IN_PROGRESS
         session.currentQuestion+=1
