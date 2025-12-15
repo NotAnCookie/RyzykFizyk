@@ -74,7 +74,8 @@ createSession(playerName: string, category: string, lang: string): Observable<an
           question_id: questionId,
           value: answerValue
       };
-      return this.http.post(`${this.sessionUrl}/verify_answer`, body, { withCredentials: true });
+      //return this.http.post(`${this.sessionUrl}/verify_answer`, body, { withCredentials: true });
+      return this.http.post(`${this.sessionUrl}/submit_answer`, body, { withCredentials: true });
   }
 
   // Pomocnicze: Pobierz aktualne pytanie (np. jak odświeżysz stronę)
