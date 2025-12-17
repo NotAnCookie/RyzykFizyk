@@ -9,25 +9,23 @@ from schemas.question import Question
 
 @pytest.fixture
 def fake_question_generator():
-    async def generate(language, category, amount):
-        return [
-            Question(
-                id=i,
-                text=f"Q{i}",
-                category=category,
-                language=language,
-                answer=1.0,
-                trivia=None,
-                sourceUrl=None
-            )
-            for i in range(1, amount + 1)
-        ]
+    generator = Mock()
+    counter = {"i": 0}
 
-    mock = Mock()
-    mock.generate = AsyncMock(side_effect=generate)
-    return mock
+    def generate_question(*, language, category):
+        counter["i"] += 1
+        return SimpleNamespace(
+            question_text=f"Q{counter['i']}",
+            topic="Test topic",
+            category=SimpleNamespace(
+                name=category.name
+            ),
+            language=language,
+            answer="1.0" 
+        )
 
-
+    generator.generate_question = Mock(side_effect=generate_question)
+    return generator
 
 
 from types import SimpleNamespace
@@ -36,28 +34,31 @@ from unittest.mock import AsyncMock
 
 @pytest.fixture
 def mock_verify_service():
-    verify = AsyncMock()
+    service = Mock()
 
-    mock_source = SimpleNamespace(
-        title="String",
-        site_name="Wikipedia",
-        url="https://example.com"
+    service.verify = Mock(
+        return_value=SimpleNamespace(
+            correct=True,
+            source=SimpleNamespace(
+                title="title",
+                site_name="Wikipedia",
+                url="https://example.com"
+            )
+        )
     )
-    mock_result = SimpleNamespace(
-        correct=0,
-        source=mock_source
-    )
+    return service
 
-    verify.verify = AsyncMock(return_value=mock_result)
-    return verify
 
 
 
 @pytest.fixture
 def mock_trivia_service():
-    trivia = AsyncMock()
-    trivia.generate = AsyncMock(return_value="Some trivia")
-    return trivia
+    service = Mock()
+    service.generate_trivia = Mock(
+        return_value=SimpleNamespace(trivia="Some trivia")
+    )
+    return service
+
 
 
 @pytest.fixture
@@ -67,6 +68,7 @@ def session_manager(fake_question_generator, mock_verify_service, mock_trivia_se
         verify_service=mock_verify_service,
         trivia_service=mock_trivia_service
     )
+
 
 
 @pytest.fixture
