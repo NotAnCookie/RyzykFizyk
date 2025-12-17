@@ -25,7 +25,7 @@ async def get_categories():
 
         new_item = {
             "id": str(key),      # np. "1"
-            "name": data.name    # np. "Geography"
+            "name": data.name    # np. "geography"
         }
         
         clean_list.append(new_item)

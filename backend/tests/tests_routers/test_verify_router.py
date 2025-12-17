@@ -1,16 +1,18 @@
 from fastapi.testclient import TestClient
 from main import app
 import json
+import pytest
 
 client = TestClient(app)
 
+@pytest.mark.google
 def test_verify_endpoint():
     response = client.post("/verify/", json={"question_id": "Ile wynosi 2+2?", "answer": "4", "language": "pl"})
     assert response.status_code == 200
     assert "correct" in response.json()
 
 
-
+@pytest.mark.google
 def test_verify_endpoint_validate_source():
     # ARRANGE
     payload = {
@@ -40,7 +42,7 @@ def test_verify_endpoint_validate_source():
     assert "title" in source
     assert "wisła" in source["title"].lower()
 
-
+@pytest.mark.google
 def test_verify_endpoint_validate_source_eng():
     # ARRANGE
     payload = {
