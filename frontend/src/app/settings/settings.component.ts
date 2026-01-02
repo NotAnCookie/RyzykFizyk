@@ -1,14 +1,6 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-// to do usunięcia później!!!!!!!!!!!!!!!
-type LanguageCode = 'en'|'pl';
-
-interface Language {
-  code: LanguageCode;
-  name: string;
-  flag: string;
-}
+import { LanguageService, LanguageCode } from '../services/language.service'; 
 
 @Component({
   selector: 'app-settings',
@@ -19,20 +11,14 @@ interface Language {
 })
 export class SettingsComponent {
 
-  selectedLanguage: LanguageCode = 'en';
+  protected languageService = inject(LanguageService);
 
-  languages: Language[] = 
-  [
-    { code: 'en', name: 'English', flag: '🇬🇧' },
-    { code: 'pl', name: 'Polish', flag: '🇵🇱' },
-  ];
+  @Output() close = new EventEmitter<void>();
 
   selectLanguage(code: LanguageCode)
   {
-    this.selectedLanguage = code;
+    this.languageService.setLanguage(code);
   }
-
-  @Output() close = new EventEmitter<void>();
 
   handleClose()
   {

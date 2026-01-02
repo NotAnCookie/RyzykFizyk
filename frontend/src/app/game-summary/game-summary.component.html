@@ -9,7 +9,7 @@
         <path d="m12 19-7-7 7-7"/>
         <path d="M19 12H5"/>
       </svg>
-      <span>Back</span>
+      <span>{{languageService.t().backToMenu}}</span>
     </button>
   </div>
 
@@ -20,7 +20,7 @@
         
         <div class="p-6 pb-3 space-y-1.5">
           <h3 class="text-purple-900 text-center text-2xl font-semibold leading-none tracking-tight">
-            Game Summary
+           {{languageService.t().gameSummary}}
           </h3>
         </div>
         
@@ -62,7 +62,7 @@
             (click)="handlePlayAgain()"
             class="bg-gradient-to-r from-purple-300 to-pink-300 hover:from-purple-400 hover:to-pink-400 text-purple-900 shadow-lg hover:shadow-xl transition-all px-12 py-6 rounded-full font-bold"
           >
-            Play Again
+            {{languageService.t().playAgain}}
           </button>
         </div>
 

@@ -1,26 +1,26 @@
 <div class="flex flex-col h-full">
   <div class="flex-1 px-6 py-6 space-y-6">
     <div class="space-y-4">
-      <h3 class="text-purple-900">Language</h3>
+      <h3 class="text-purple-900">{{languageService.t().language}}</h3>
       
       <div class="h-[1px] w-full bg-purple-200/50"></div>
       
       <div class="space-y-2">
         <button
-          *ngFor="let lang of languages"
+          *ngFor="let lang of languageService.availableLanguages"
           (click)="selectLanguage(lang.code)"
           class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all"
           [ngClass]="{
-            'bg-purple-200/50 border-2 border-purple-300': selectedLanguage === lang.code,
-            'bg-white/50 border-2 border-transparent hover:border-purple-200': selectedLanguage !== lang.code
+            'bg-purple-200/50 border-2 border-purple-300': languageService.currentLang() == lang.code,
+            'bg-white/50 border-2 border-transparent hover:border-purple-200': languageService.currentLang() != lang.code
           }"
         >
           <div class="flex items-center gap-3">
             <span class="text-2xl">{{ lang.flag }}</span>
-            <span class="text-purple-900">{{ lang.name }}</span>
+            <span class="text-purple-900">{{ lang.label }}</span>
           </div>
 
-          <span *ngIf="selectedLanguage === lang.code" class="text-purple-600 font-bold text-xl">
+          <span *ngIf="languageService.currentLang() == lang.code" class="text-purple-600 font-bold text-xl">
             ✓
           </span>
         </button>
@@ -44,7 +44,7 @@
             transition-all
             hover:bg-purple-50
             hover:border-purple-300
-            "> Close</button>
+            "> {{languageService.t().close}} </button>
     </div>
   </div>
 </div>

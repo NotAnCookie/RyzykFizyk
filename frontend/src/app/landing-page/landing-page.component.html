@@ -18,7 +18,7 @@
       <h1 class="fancy-title text-purple-900/80 mb-8 text-5xl md:text-6xl lg:text-7xl">Risky Physics</h1>
       
       <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-lg border-2 border-white">
-        <h3 class="text-purple-900 mb-6">Choose Category</h3>
+        <h3 class="text-purple-900 mb-6"> {{languageService.t().chooseCategory}} </h3>
         
         
         <div class="space-y-4">
@@ -45,7 +45,7 @@
         (click)="startGame()"
         class="bg-gradient-to-r from-purple-300 to-pink-300 hover:from-purple-400 hover:to-pink-400 text-purple-900 shadow-lg hover:shadow-xl transition-all px-12 py-6 rounded-full"
       >
-        Start Game
+        {{languageService.t().startGame}}
       </button>
     </div>
   </main>
@@ -81,7 +81,7 @@
 <div *ngIf="isSettingsOpen">
   <div (click)="isSettingsOpen = false" class="sheet-overlay"></div>
   <div class="sheet-content">
-    <h3 class="text-purple-900 text-lg font-semibold">Settings</h3>
+    <h3 class="text-purple-900 text-lg font-semibold">{{languageService.t().settings}}</h3>
     
     <app-settings (close)="isSettingsOpen = false"></app-settings>
     

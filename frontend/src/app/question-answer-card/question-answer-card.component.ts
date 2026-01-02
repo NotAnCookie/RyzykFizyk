@@ -1,7 +1,8 @@
-import { Component, Output,Input, EventEmitter } from '@angular/core';
+import { Component, Output,Input, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { QuestionResponse } from "../models/question.model";
+import { LanguageService } from '../services/language.service';
 
 @Component({
   selector: 'app-question-answer-card',
@@ -12,20 +13,12 @@ import { QuestionResponse } from "../models/question.model";
 })
 export class QuestionAnswerCardComponent {
 
+  protected languageService = inject(LanguageService);
   @Input() question!: QuestionResponse;
 
   @Output() back = new EventEmitter<void>();
   @Output() next = new EventEmitter<void>();
 
-  // Na razie jakiekolwiek pytanie
-@Input() answerData = {
-    question: "How tall is the Eiffel Tower?",
-    category: "Geography",
-    correctAnswer: "330 meters (1,083 feet)",
-    userAnswer: "300 meters",    funFact: "The Eiffel Tower can be 15 cm taller during the summer due to thermal expansion of the iron structure when heated by the sun.",
-    source: "https://www.toureiffel.paris",
-    sourceDisplay: "toureiffel.paris"
-  };
   @Input() currentQuestionIndex: number = 0;
   @Input() totalQuestions: number = 0;
 

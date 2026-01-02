@@ -9,7 +9,7 @@
         <path d="m12 19-7-7 7-7"/>
         <path d="M19 12H5"/>
       </svg>
-      <span>Back to menu</span>
+      <span>{{languageService.t().backToMenu}}</span>
     </button>
   </div>
 
@@ -22,7 +22,7 @@
           <span class="text-purple-600 px-3 py-1 bg-purple-200 rounded-full text-sm font-medium">
              {{question.category}}
           </span>
-          <span class="text-purple-600 text-sm">Question {{currentQuestionIndex}} of 7</span>
+          <span class="text-purple-600 text-sm">{{languageService.t().question}} {{currentQuestionIndex}} {{languageService.t().of}} 7</span>
         </div>
         <h3 class="text-purple-900 text-center mt-4 text-2xl font-semibold leading-none tracking-tight">
            {{question.topic}}: {{question.text}}
@@ -33,7 +33,7 @@
           (click)="handleNext()"
           class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-purple-300 to-pink-300 hover:from-purple-400 hover:to-pink-400 text-purple-900 shadow-lg hover:shadow-xl px-12 py-6 rounded-full h-10"
         >
-          Show Answer
+          {{languageService.t().showAnswer}}
         </button>
       </div>
         </div>

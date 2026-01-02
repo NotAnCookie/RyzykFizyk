@@ -1,7 +1,8 @@
-import { Component, Output, Input, EventEmitter } from '@angular/core';
+import { Component, Output, Input, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { QuestionResponse } from "../models/question.model";
+import { LanguageService } from '../services/language.service';
 
 @Component({
   selector: 'app-question-card',
@@ -11,6 +12,7 @@ import { QuestionResponse } from "../models/question.model";
   styleUrl: './question-card.component.css'
 })
 export class QuestionCardComponent {
+  protected languageService = inject(LanguageService);
 
   @Input() question!: QuestionResponse;
   @Input() currentQuestionIndex: number = 0;
