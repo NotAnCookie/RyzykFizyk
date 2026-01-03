@@ -1,8 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from typing import List
 from pydantic import BaseModel
 
-from services.question_generator.src.categories import AVAILABLE_CATEGORIES
+from services.question_generator.src.categories import AVAILABLE_CATEGORIES, CATEGORIES_CONFIG
 import random
 
 router = APIRouter(
@@ -16,23 +16,42 @@ class CategoryResponse(BaseModel):
 
 
 @router.get("/categories", response_model=List[CategoryResponse])
-async def get_categories():
-    
-    clean_list = []
-    
-    # Iterujemy po słowniku i wyciągamy z niego to co potrzebne
-    for key, data in AVAILABLE_CATEGORIES.items():
-
-        new_item = {
-            "id": str(key),      # np. "1"
-            "name": data.name    # np. "geography"
-        }
+async def get_categories(
+    lang: str = Query("en", description="Kod języka (en/pl)")
+    ):
+        clean_list = []
         
-        clean_list.append(new_item)
-    
-    return clean_list
+        for cat_id, full_data in CATEGORIES_CONFIG.items():
+            
+            lang_specific_data = full_data.get(lang, full_data.get("en"))
 
-# @router.post("/generate", response_model=List[QuestionItemDTO])
+            if not lang_specific_data:
+                continue
+
+            new_item = {
+                "id": cat_id,                 # np. "geography"
+                "name": lang_specific_data["name"] # np. "Geografia" (jeśli lang="pl")
+            }
+            
+            clean_list.append(new_item)
+        
+        return clean_list
+
+#     clean_list = []
+    
+#     # Iterujemy po słowniku i wyciągamy z niego to co potrzebne
+#     for key, data in AVAILABLE_CATEGORIES.items():
+
+#         new_item = {
+#             "id": str(key),      # np. "1"
+#             "name": data.name    # np. "geography"
+#         }
+        
+#         clean_list.append(new_item)
+    
+#     return clean_list
+
+# # @router.post("/generate", response_model=List[QuestionItemDTO])
 # async def generate_quiz(request: GenerateQuizRequestDTO):
 #     generated = []
 #     attempts = 0

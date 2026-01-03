@@ -5,6 +5,7 @@ from schemas.question import Question
 from mappers.question_mapper import *
 from services.answer_verification.src.models import VerificationRequest, VerificationResult
 from services.trivia_generator.src.models import TriviaRequest
+from services.question_generator.src.categories import CATEGORIES_CONFIG
 import asyncio
 
 class SessionManager:
@@ -19,16 +20,14 @@ class SessionManager:
 
     def create_session(self, player: Player, language: Language, category_id: str) -> GameSession:
 
-        if category_id not in AVAILABLE_CATEGORIES:
+        if category_id not in CATEGORIES_CONFIG:
             raise ValueError(f"Category ID  {category_id} not found")
         
-        category_obj = AVAILABLE_CATEGORIES[category_id]
-
         session = GameSession(
             id=len(self.sessions) + 1,
             player=player,
             language=language,
-            category=category_obj,
+            category=category_id,
             questions=[],
             answers=[],
             currentQuestion=-1,

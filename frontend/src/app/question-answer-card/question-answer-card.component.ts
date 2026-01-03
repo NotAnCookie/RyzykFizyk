@@ -21,6 +21,7 @@ export class QuestionAnswerCardComponent {
 
   @Input() currentQuestionIndex: number = 0;
   @Input() totalQuestions: number = 0;
+  @Input() selectedCategory: string = "";
 
   handleBack() 
   {

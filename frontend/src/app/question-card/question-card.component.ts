@@ -17,6 +17,7 @@ export class QuestionCardComponent {
   @Input() question!: QuestionResponse;
   @Input() currentQuestionIndex: number = 0;
   @Input() totalQuestions: number = 0;
+  @Input() selectedCategory: string = "";
 
   @Output() back = new EventEmitter<void>();
   @Output() next = new EventEmitter<void>();

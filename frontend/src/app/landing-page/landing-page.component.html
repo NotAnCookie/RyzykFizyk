@@ -94,6 +94,7 @@
   [question]="currentQuestion!"
   [currentQuestionIndex] = "currentQuestionIndex + 1"
   [totalQuestions] = "questionsList.length"
+  [selectedCategory] = "getCategoryName(selectedCategory)"
   (back)="backToMenu()"
   (next) = "showAnswerCard=true; showQuestionCard=false; showAnswer()">
 </app-question-card>
@@ -103,6 +104,7 @@
   <app-question-answer-card
     [question]="currentQuestion!"
     [currentQuestionIndex] = "currentQuestionIndex + 1"
+    [selectedCategory] = "getCategoryName(selectedCategory)"
     (back)="backToMenu()"
     (next) = "handleNextQuestion()"
   ></app-question-answer-card>

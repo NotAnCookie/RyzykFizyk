@@ -33,7 +33,7 @@ def map_generated_question_to_global(q) -> GlobalQuestion:
         id=int(uuid.uuid4().int >> 64), 
         text=q.question_text,
         topic=q.topic,
-        category=GlobalCategory[q.category.name.upper()],
+        category=q.category,
         language=q.language,
         answer=float(q.answer) if q.answer else None,
         trivia=None,

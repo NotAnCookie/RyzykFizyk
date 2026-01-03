@@ -89,8 +89,9 @@ createSession(playerName: string, category: string, lang: string): Observable<an
   }
 
   //Pobierz kategorie
-  getCategories(): Observable<CategoryResponse[]> {
+  getCategories(lang: string): Observable<CategoryResponse[]> {
     const url = `${this.questionsUrl}/categories`;
-    return this.http.get<CategoryResponse[]>(url);
+    return this.http.get<CategoryResponse[]>(url, { params: {lang: lang}});
   }
+
 }

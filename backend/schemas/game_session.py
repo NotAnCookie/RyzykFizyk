@@ -14,6 +14,6 @@ class GameSession(BaseModel):
     answers: list[PlayerAnswer]
     currentQuestion: int
     language: Language
-    category: WikiCategory
+    category: str
     state: SessionState
 

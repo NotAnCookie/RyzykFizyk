@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { FormsModule } from '@angular/forms'; 
 import { SettingsComponent } from '../settings/settings.component';
@@ -48,12 +48,22 @@ export class LandingPageComponent implements OnInit {
   sessionID: number|null = null;
   answerData: any = null;
 
+  constructor() {
+    effect(() => {
+      const lang = this.languageService.currentLang();
+      
+      console.log('🔄 Wykryto zmianę języka na:', lang, '- pobieram nowe kategorie...');
+      
+      this.loadCategories();
+    });
+  }
+
   ngOnInit(): void {
     this.loadCategories();
   }
 
   loadCategories() {
-    this.quizService.getCategories().subscribe({
+    this.quizService.getCategories(this.languageService.currentLang()).subscribe({
     next: (data: any[]) => { // Używamy any[], żeby TypeScript nie krzyczał przy naprawianiu
         
         console.log("Surowe dane z Pythona:", data);
@@ -110,7 +120,7 @@ startGame() {
 
     this.showQuestionCard = true;
 
-  this.quizService.createSession("Player1", this.selectedCategory, 'en').subscribe({
+  this.quizService.createSession("Player1", this.selectedCategory, this.languageService.currentLang()).subscribe({
     next: (response: any) => {
 
       const rawQuestion = response.current_question;
@@ -140,10 +150,6 @@ startGame() {
       //this.currentQuestion = response.current_question;
       this.currentQuestionIndex = 0;
       //this.showQuestionCard = true; 
-
-      if(this.sessionID){
-        this.loadQuestions(this.sessionID, 6);
-      }
     },
     error: (err) => {
       console.error("Błąd startu:", err);
@@ -185,6 +191,14 @@ startGame() {
             console.error(`❌ Generating question error #${currentCount + 1}:`, e);
           }
         });
+  }
+
+  getCategoryName(id: string): string {
+    if (!this.categories || this.categories.length === 0) return id;
+
+    const foundCategory = this.categories.find(c => c.id === id);
+
+    return foundCategory ? foundCategory.name : id;
   }
 
   finalizeGameStart() {
