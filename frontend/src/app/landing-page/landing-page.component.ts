@@ -318,8 +318,6 @@ startGame() {
         this.quizService.endSession().subscribe();
     }
 
-  this.quizService.endSession().subscribe(); 
-
   this.showGameSummary = false;
   this.showQuestionCard = false;
   this.showAnswerCard = false;

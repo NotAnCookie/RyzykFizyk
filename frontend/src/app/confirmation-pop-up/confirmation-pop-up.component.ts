@@ -16,7 +16,6 @@ export class ConfirmationPopUpComponent {
   @Output() confirm = new EventEmitter<void>(); // Użytkownik kliknął TAK
   @Output() cancel = new EventEmitter<void>();  // Użytkownik kliknął NIE
 
-  // Proste słowniki tekstów (możesz to przenieść do serwisu, ale tu też jest OK)
   text = {
     pl: {
       title: 'Czy na pewno chcesz wyjść?',

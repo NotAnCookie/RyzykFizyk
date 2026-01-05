@@ -113,7 +113,7 @@
 <div *ngIf="showGameSummary" class="absolute inset-0 z-10 bg-white">
   <app-game-summary
     [questions] = "questionsList"
-    (back)="backToMenu()"
+    (back)="exitGame()"
     (playAgain) = "showGameSummary = false">
   </app-game-summary>
 </div>
