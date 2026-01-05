@@ -1,0 +1,8 @@
+<div class="overlay">
+    <div class="spinner"></div>
+    <h2>{{ languageService.t().loading }}</h2>
+    
+    <button (click)="cancel.emit()">
+        {{ languageService.t().cancel }}
+    </button>
+</div>

@@ -10,6 +10,9 @@ import { QuizService, CategoryResponse } from '../services/quiz.service';
 import { QuestionResponse } from '../models/question.model';
 import { producerUpdatesAllowed } from '@angular/core/primitives/signals';
 import { LanguageService } from '../services/language.service';
+import { LoadingScreenComponent } from '../loading-screen/loading-screen.component';
+import { ConfirmationPopUpComponent } from '../confirmation-pop-up/confirmation-pop-up.component';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-landing-page',
@@ -21,7 +24,9 @@ import { LanguageService } from '../services/language.service';
     //UserProfileComponent
     QuestionCardComponent,
     QuestionAnswerCardComponent,
-    GameSummaryComponent
+    GameSummaryComponent,
+    LoadingScreenComponent,
+    ConfirmationPopUpComponent,
   ],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css'
@@ -31,8 +36,14 @@ export class LandingPageComponent implements OnInit {
   private quizService = inject(QuizService);
   public languageService = inject(LanguageService);
 
+  isGameActive: boolean = false; 
+  private backgroundSub: Subscription | null = null;
+
   //isProfileOpen: boolean = false;
   isSettingsOpen: boolean = false;
+  
+  isLoading: boolean = false;
+  showExitConfirmation: boolean = false;
   
   selectedCategory: string = ''; 
 
@@ -111,17 +122,23 @@ startGame() {
       alert("Wybierz kategorię!");
       return;
     }
+    
+    this.isGameActive = true;
 
     this.questionsList = [];     
     this.currentQuestion = null;
     this.currentQuestionIndex = 0;
     this.showGameSummary = false;    
     this.showQuestionCard = false; 
-
-    this.showQuestionCard = true;
+    this.isLoading = true;
 
   this.quizService.createSession("Player1", this.selectedCategory, this.languageService.currentLang()).subscribe({
     next: (response: any) => {
+
+      if(!this.isGameActive){
+        this.exitGame();
+        return;
+      }
 
       const rawQuestion = response.current_question;
       this.sessionID = response.session_id;
@@ -130,13 +147,17 @@ startGame() {
             next: (verifiedQuestion) => {
                 console.log("✅ Pytanie 1 zweryfikowane:", verifiedQuestion);
                 
+                if(!this.isGameActive){
+                  this.exitGame();
+                  return;
+                }
                 // Zapisujemy już PEŁNE pytanie
                 this.questionsList = [verifiedQuestion];
                 this.currentQuestion = verifiedQuestion;
                 
                 // Pokazujemy grę
                 this.showQuestionCard = true;
-                // this.isLoadingGame = false; // (jeśli używasz)
+                this.isLoading = false; 
 
                 // Odpalamy ładowanie reszty w tle
                 if (this.sessionID) {
@@ -146,15 +167,12 @@ startGame() {
             error: (err) => console.error("Błąd weryfikacji Q1:", err)
         });
 
-      //this.questionsList = [response.current_question]; 
-      //this.currentQuestion = response.current_question;
+
       this.currentQuestionIndex = 0;
-      //this.showQuestionCard = true; 
     },
     error: (err) => {
       console.error("Błąd startu:", err);
-      // Fallback do mocków (opcjonalnie)
-      //this.questionsList = this.getMockQuestions();
+
       if(this.questionsList.length > 0) {
           this.currentQuestion = this.questionsList[0];
           this.currentQuestionIndex = 0;
@@ -166,28 +184,35 @@ startGame() {
 
 
   loadQuestions(sessionId: number, count: number, currentCount: number = 0) {
-    if(currentCount >= count){
-      return;
-    }
+    if(!this.isGameActive) return;
 
-    this.quizService.generateBackgroundQuestion(sessionId).subscribe({
+    if(currentCount >= count) return;
+
+    this.backgroundSub = this.quizService.generateBackgroundQuestion(sessionId).subscribe({
           next: (nextQ) => {
             console.log(`📥 Pytanie tła #${currentCount + 1} gotowe:`, nextQ.text?.substring(0, 20) + "...");
+
+            if(!this.isGameActive) return;
             
             this.quizService.verifyAnswer(nextQ.id, 111).subscribe({
+
                 next: (verifiedNextQ) => {
                     console.log(`📥 Pytanie tła #${currentCount + 1} gotowe i zweryfikowane.`);
+
+                    if(!this.isGameActive) return;
                     
                     this.questionsList.push(verifiedNextQ);
                     this.loadQuestions(sessionId, count, currentCount + 1);
                 },
                 error: (err) => {
+                    if (!this.isGameActive) return;
                     console.error("Błąd weryfikacji w tle:", err);
                     this.loadQuestions(sessionId, count, currentCount + 1);
                 }
             });
           },
           error: (e) => {
+            if (!this.isGameActive) return;
             console.error(`❌ Generating question error #${currentCount + 1}:`, e);
           }
         });
@@ -279,7 +304,20 @@ startGame() {
 
   }
 
-  backToMenu() {
+  exitGame() {
+
+    this.isGameActive = false;
+    this.showExitConfirmation = false;
+
+    if (this.backgroundSub) {
+        this.backgroundSub.unsubscribe();
+        this.backgroundSub = null;
+    }
+
+    if (this.sessionID) {
+        this.quizService.endSession().subscribe();
+    }
+
   this.quizService.endSession().subscribe(); 
 
   this.showGameSummary = false;
@@ -290,65 +328,20 @@ startGame() {
   this.selectedCategory = ""; 
   }
 
-  // Zwraca listę pytań awaryjnych (gdy backend nie działa)
- /* getMockQuestions(): QuestionResponse[] {
-    return [
-      {
-        id: 1,
-        category: 'Demo',
-        topic: 'Angular',
-        text: 'Angular jest frameworkiem stworzonym przez firmę [???].',
-        answer: 'Google',
-        language: 'pl'
-      },
-      {
-        id: 2,
-        category: 'Demo',
-        topic: 'Układ Słoneczny',
-        text: 'Największą planetą w Układzie Słonecznym jest [???].',
-        answer: 'Jowisz',
-        language: 'pl'
-      },
-      {
-        id: 3,
-        category: 'Demo',
-        topic: 'Matematyka',
-        text: 'Liczba Pi w przybliżeniu wynosi 3,[???].',
-        answer: '14',
-        language: 'pl'
-      },
-      {
-        id: 4,
-        category: 'Demo',
-        topic: 'Historia Polski',
-        text: 'Chrzest Polski odbył się w roku [???].',
-        answer: '966',
-        language: 'pl'
-      },
-      {
-        id: 5,
-        category: 'Demo',
-        topic: 'Chemia',
-        text: 'Symbol chemiczny złota to [???].',
-        answer: 'Au',
-        language: 'pl'
-      },
-      {
-        id: 6,
-        category: 'Demo',
-        topic: 'Biologia',
-        text: 'Dorosły człowiek ma zazwyczaj [???] zęby (wliczając ósemki).',
-        answer: '32',
-        language: 'pl'
-      },
-      {
-        id: 7,
-        category: 'Demo',
-        topic: 'Geografia',
-        text: 'Stolicą Francji jest [???].',
-        answer: 'Paryż',
-        language: 'pl'
-      }
-    ];
-  }*/
+  cancelLoading() {
+    this.isLoading = false;
+    this.exitGame();
+
+}
+
+backToMenu()
+{
+  this.showExitConfirmation = true;
+}
+
+cancelExit()
+{
+  this.showExitConfirmation = false;
+}
+
 }

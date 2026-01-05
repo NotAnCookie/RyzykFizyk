@@ -1,0 +1,82 @@
+/* Tło (Overlay) - to samo co w loaderze */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000; /* Bardzo wysoko */
+}
+
+/* Karta */
+.modal-card {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2.5rem;
+    border-radius: 2rem;
+    box-shadow: 0 10px 25px rgba(107, 33, 168, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    max-width: 90%;
+    width: 400px;
+    text-align: center;
+}
+
+h3 {
+    color: #581c87; /* Purple-900 */
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+p {
+    color: #6b21a8; /* Purple-800 */
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+/* Kontener na przyciski */
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Wspólne style przycisków */
+button {
+    padding: 10px 20px;
+    border-radius: 9999px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+/* Przycisk NIE (Bezpieczny - domyślny styl) */
+.btn-cancel {
+    background: white;
+    color: #7e22ce;
+    border: 2px solid #e9d5ff;
+}
+.btn-cancel:hover {
+    background: #f3e8ff;
+}
+
+/* Przycisk TAK (Niebezpieczny - różowy/czerwony) */
+.btn-confirm {
+    background: #c927db; /* Pink-600 */
+    color: white;
+    border: 2px solid #db2777;
+}
+.btn-confirm:hover {
+    background: #be185d; /* Pink-700 */
+    border-color: #be185d;
+}

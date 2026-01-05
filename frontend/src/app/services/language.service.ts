@@ -25,7 +25,8 @@ export interface Translations {
   close: string;
   gameSummary: string;
   playAgain: string;
-  language: string
+  language: string;
+  cancel: string
 }
 
 @Injectable({
@@ -51,14 +52,15 @@ export class LanguageService {
     funFact: "Fun Fact 💡",
     source: "Source",
     backToMenu: "Back to Menu",
-    loading: "Preparing quiz...",
+    loading: "Generating questions...",
     question: "Question",
     of: "of",
     settings: "Settings",
     close: "Close",
     gameSummary: "Game Summary",
     playAgain: "Play Again",
-    language: "Language"
+    language: "Language",
+    cancel: "Cancel"
   },
   pl: {
     startGame: "Rozpocznij Grę",
@@ -70,14 +72,15 @@ export class LanguageService {
     funFact: "Ciekawostka 💡",
     source: "Źródło",
     backToMenu: "Powrót do Menu",
-    loading: "Przygotowuję quiz...",
+    loading: "Generowanie pytań...",
     question: "Pytanie",
     of: "z",
     settings: "Ustawienia",
     close: "Zamknij",
     gameSummary: "Podsumowanie Gry",
     playAgain: "Zagraj Ponownie",
-    language: "Język"
+    language: "Język",
+    cancel: "Anuluj"
   }
 };
 

@@ -118,4 +118,15 @@
   </app-game-summary>
 </div>
 
+<app-loading-screen 
+    *ngIf="isLoading" 
+    (cancel)="cancelLoading()">
+</app-loading-screen>
+
+<app-confirmation-pop-up
+    *ngIf="showExitConfirmation"
+    (confirm)="exitGame()"
+    (cancel)="cancelExit()">
+</app-confirmation-pop-up>
+
 </div>

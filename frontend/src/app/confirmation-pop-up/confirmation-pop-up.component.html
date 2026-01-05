@@ -1,0 +1,16 @@
+<div class="overlay">
+    <div class="modal-card">
+        <h3>{{ t.title }}</h3>
+        <p>{{ t.message }}</p>
+        
+        <div class="buttons">
+            <button class="btn-cancel" (click)="cancel.emit()">
+                {{ t.no }}
+            </button>
+            
+            <button class="btn-confirm" (click)="confirm.emit()">
+                {{ t.yes }}
+            </button>
+        </div>
+    </div>
+</div>
