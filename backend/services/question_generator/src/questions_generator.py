@@ -140,50 +140,8 @@ class QuestionGenerator:
             random.shuffle(results)
             return random.choice(results)
             
-            # for potential_topic in results:
-                    
-            #         lower = potential_topic.lower()
-            #         if any(x in lower for x in ["lista ", "list of ", "spis ", "timeline ", "ujednoznacznienie"]):
-            #             continue
-
-            #         if self.check_relevance(potential_topic, category.name, language):
-            #             return potential_topic
         except Exception:
             return None
-
-    def check_relevance(self, str, topic: str, category_name: str, language: Language) -> bool:
-        lang_key = language.value
-        prompt_template = RELEVANCE_PROMPT_TEMPLATE.get(lang_key, RELEVANCE_PROMPT_TEMPLATE["en"])
-        print(f"  2137...")
-        
-        user_prompt = prompt_template.format(
-            category_name=category_name,
-            topic=topic,
-        )
-
-        try:
-            response = self.client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": "You are a category judge."},
-                    {"role": "user", "content": user_prompt}
-                ],
-                response_format={ "type": "json_object" },
-                temperature=0.1, # Bardzo nisko! Chcemy logicznej, chłodnej oceny.
-                max_tokens=100   # Oszczędzamy tokeny, odpowiedź będzie krótka
-            )
-            data = json.loads(response.choices[0].message.content)
-            
-            is_valid = data.get("is_relevant", False)
-            if not is_valid:
-                print(f"🚫 SĘDZIA: Odrzucono temat '{topic}' dla kategorii '{category_name}'.")
-            else:
-                print(f"✅ SĘDZIA: Zaakceptowano temat '{topic}'.")
-                
-            return is_valid
-        except Exception as e:
-            print(f"❌ Relevance Check Error: {e}")
-            return False
         
     def generate_question_with_ai(self, context_text: str, topic: str, language: Language) -> Optional[dict]:
 
