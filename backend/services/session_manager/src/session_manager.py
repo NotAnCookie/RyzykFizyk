@@ -6,6 +6,7 @@ from mappers.question_mapper import *
 from services.answer_verification.src.models import VerificationRequest, VerificationResult
 from services.trivia_generator.src.models import TriviaRequest
 from services.question_generator.src.categories import CATEGORIES_CONFIG
+from fastapi import HTTPException
 import asyncio
 
 class SessionManager:
@@ -38,24 +39,53 @@ class SessionManager:
     
     async def start_session(self, session_id: int) -> GameSession:
         session = self.sessions[session_id]
-
         session.state = SessionState.LOADING
 
-        # generujemy pierwsze pytanie
-        generated_q = self.question_generator.generate_question(
-            category=session.category,
-            language=session.language
-        )
-
+        # KROK 1: Generujemy Q1 (Blokujemy użytkownika na te 3-5s, bo musi mieć co robić)
+        # Używamy _generate_single_complete_question, żeby Q1 też miało od razu trivię!
+        first_q = await self._generate_single_complete_question(session, 0)
         
-        first_question = map_generated_question_to_global(generated_q)
-        first_question.id = len(session.questions) + 1
+        if not first_q:
+             raise HTTPException(status_code=503, detail="Failed to start game.")
 
-        session.questions.append(first_question)
+        first_q.id = 1
+        session.questions.append(first_q)
+
+        # KROK 2: Resztę (5 pytań) puszczamy w tle
+        # UWAGA: create_task powoduje, że Python NIE CZEKA tutaj na wynik.
+        # Python idzie do następnej linijki (return) natychmiast.
+        asyncio.create_task(self._prefill_questions_background(session_id, 6))
 
         session.state = SessionState.IN_PROGRESS
-        session.currentQuestion+=1
+        session.currentQuestion += 1
+        
+        # KROK 3: Zwracamy sesję. Gracz gra.
+        # W międzyczasie w tle mieli się 5 wątków. Zanim gracz odpowie na Q1, 
+        # Q2-Q6 będą już gotowe w liście session.questions.
         return session
+    
+
+    
+    # async def start_session2(self, session_id: int) -> GameSession:
+    #     session = self.sessions[session_id]
+
+    #     session.state = SessionState.LOADING
+
+    #     # generujemy pierwsze pytanie
+    #     generated_q = self.question_generator.generate_question(
+    #         category=session.category,
+    #         language=session.language
+    #     )
+
+        
+    #     first_question = map_generated_question_to_global(generated_q)
+    #     first_question.id = len(session.questions) + 1
+
+    #     session.questions.append(first_question)
+
+    #     session.state = SessionState.IN_PROGRESS
+    #     session.currentQuestion+=1
+    #     return session
 
     
     async def get_next_question(self, session_id: int):
@@ -194,6 +224,77 @@ class SessionManager:
         return session
     
 
-    
+    async def _generate_single_complete_question(self, session: GameSession, index_offset: int):
+        try:
+            # A. Generowanie treści (Tekst + Odpowiedź)
+            generated_q = await asyncio.to_thread(
+                self.question_generator.generate_question,
+                category=session.category,
+                language=session.language
+            )
+
+            if not generated_q:
+                print("⚠️ [Batch] Generator zwrócił None.")
+                return None
+
+            question = map_generated_question_to_global(generated_q)
+            
+            # B. Wzbogacanie (Trivia + Source) - RÓWNOLEGLE!            
+            async def get_trivia():
+                if self.trivia_service:
+                    req = TriviaRequest(question_text=question.text, language=session.language)
+                    return await asyncio.to_thread(self.trivia_service.generate_trivia, req)
+                return None
+
+            async def get_source():
+                req = VerificationRequest(
+                    question_text=question.text, 
+                    numeric_answer=question.answer, 
+                    language=session.language
+                )
+                return await asyncio.to_thread(self.verify_service.verify, req)
+
+            trivia_res, source_res = await asyncio.gather(get_trivia(), get_source(), return_exceptions=True)
+
+            # Przypisanie wyników (z obsługą błędów wewnątrz gather)
+            if isinstance(trivia_res, Exception):
+                print(f"⚠️ Błąd Trivii: {trivia_res}")
+                question.trivia = None
+            elif trivia_res:
+                question.trivia = trivia_res.trivia
+
+            if isinstance(source_res, Exception):
+                print(f"⚠️ Błąd Źródła: {source_res}")
+                question.sourceUrl = None
+            elif source_res and source_res.source:
+                question.sourceUrl = source_res.source.url
+
+            return question
+
+        except Exception as e:
+            print(f"❌ [Batch] Błąd generowania pojedynczego pytania: {e}")
+            return None
+
+    async def _prefill_questions_background(self, session_id: int, count: int):
+        session = self.sessions.get(session_id)
+        if not session: return
+
+        print(f"🚀 [PREFILL] Startuję generowanie {count} pytań równolegle dla sesji {session_id}...")
+
+        tasks = [self._generate_single_complete_question(session, i) for i in range(count)]
+        
+        # Uruchamiamy WSZYSTKIE naraz i czekamy aż wszystkie spłyną
+        results = await asyncio.gather(*tasks)
+
+        # Filtrujemy None (nieudane próby)
+        valid_questions = [q for q in results if q is not None]
+
+        current_len = len(session.questions)
+        for i, q in enumerate(valid_questions):
+            q.id = current_len + i + 1
+            session.questions.append(q)
+            print(f"✅ [PREFILL] Dodano gotowe pytanie ID: {q.id}")
+
+        print(f"🏁 [PREFILL] Zakończono! Dodano {len(valid_questions)} pytań. Razem w sesji: {len(session.questions)}")
 
 

@@ -26,7 +26,9 @@ export interface Translations {
   gameSummary: string;
   playAgain: string;
   language: string;
-  cancel: string
+  cancel: string;
+  sthWentWrong: string;
+  connectionError: string;
 }
 
 @Injectable({
@@ -60,7 +62,9 @@ export class LanguageService {
     gameSummary: "Game Summary",
     playAgain: "Play Again",
     language: "Language",
-    cancel: "Cancel"
+    cancel: "Cancel", 
+    sthWentWrong: "Oops, something went wrong...",
+    connectionError: "Connection Error"
   },
   pl: {
     startGame: "Rozpocznij Grę",
@@ -80,7 +84,9 @@ export class LanguageService {
     gameSummary: "Podsumowanie Gry",
     playAgain: "Zagraj Ponownie",
     language: "Język",
-    cancel: "Anuluj"
+    cancel: "Anuluj",
+    sthWentWrong: "Ups, coś poszło nie tak...",
+    connectionError: "Błąd Połączenia"
   }
 };
 

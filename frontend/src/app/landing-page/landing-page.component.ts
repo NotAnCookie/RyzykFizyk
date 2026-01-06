@@ -44,6 +44,8 @@ export class LandingPageComponent implements OnInit {
   
   isLoading: boolean = false;
   showExitConfirmation: boolean = false;
+  showError: boolean = false;
+  errorMessage: string = this.languageService.t().connectionError;
   
   selectedCategory: string = ''; 
 
@@ -108,9 +110,8 @@ export class LandingPageComponent implements OnInit {
 
       },
       error: (err) => {
-        //console.error("Błąd pobierania kategorii:", err);
-        this.categories = [{ id: 'error', name: 'Błąd połączenia' }];
-       // this.categories.unshift({ id: 'x', name: 'Random 🎲' });  
+        console.error("Błąd pobierania kategorii:", err);
+        this.categories = [{ id: 'error', name: this.languageService.t().connectionError }];
         this.selectedCategory = this.categories[0].id;
 
       }
@@ -131,6 +132,7 @@ startGame() {
     this.showGameSummary = false;    
     this.showQuestionCard = false; 
     this.isLoading = true;
+    this.showError = false;
 
   this.quizService.createSession("Player1", this.selectedCategory, this.languageService.currentLang()).subscribe({
     next: (response: any) => {
@@ -140,38 +142,24 @@ startGame() {
         return;
       }
 
-      const rawQuestion = response.current_question;
-      this.sessionID = response.session_id;
+        const rawQuestion = response.current_question;
+        this.sessionID = response.session_id;
 
-      this.quizService.verifyAnswer(rawQuestion.id, 111).subscribe({
-            next: (verifiedQuestion) => {
-                console.log("✅ Pytanie 1 zweryfikowane:", verifiedQuestion);
-                
-                if(!this.isGameActive){
-                  this.exitGame();
-                  return;
-                }
-                // Zapisujemy już PEŁNE pytanie
-                this.questionsList = [verifiedQuestion];
-                this.currentQuestion = verifiedQuestion;
-                
-                // Pokazujemy grę
-                this.showQuestionCard = true;
-                this.isLoading = false; 
-
-                // Odpalamy ładowanie reszty w tle
-                if (this.sessionID) {
-                    this.loadQuestions(this.sessionID, 6);
-                }
-            },
-            error: (err) => console.error("Błąd weryfikacji Q1:", err)
-        });
-
-
-      this.currentQuestionIndex = 0;
+        console.log("✅ Sesja utworzona. Pytanie 1 (z metadanymi):", rawQuestion);
+        
+        this.handleFirstQuestion(rawQuestion);
     },
     error: (err) => {
       console.error("Błąd startu:", err);
+
+        this.isLoading = false; 
+        this.isGameActive = false;
+        
+        this.errorMessage = this.languageService.currentLang() === 'pl' 
+            ? "Nie udało się połączyć z serwerem gry. Spróbuj ponownie." 
+            : "Could not connect to game server. Please try again.";
+            
+        this.showError = true;
 
       if(this.questionsList.length > 0) {
           this.currentQuestion = this.questionsList[0];
@@ -182,11 +170,26 @@ startGame() {
   });
   }
 
+  handleFirstQuestion(question: QuestionResponse) {
+    if(!this.isGameActive){ this.exitGame(); return; }
+
+    this.questionsList = [question];
+    this.currentQuestion = question;
+    
+    this.showQuestionCard = true;
+    this.isLoading = false; 
+
+    // if (this.sessionID) {
+    //     this.loadQuestions(this.sessionID, 6);
+    // }
+}
 
   loadQuestions(sessionId: number, count: number, currentCount: number = 0) {
     if(!this.isGameActive) return;
 
-    if(currentCount >= count) return;
+    if(this.questionsList.length >= count) return;
+
+    if(currentCount >= 20) return;
 
     this.backgroundSub = this.quizService.generateBackgroundQuestion(sessionId).subscribe({
           next: (nextQ) => {
@@ -207,6 +210,14 @@ startGame() {
                 error: (err) => {
                     if (!this.isGameActive) return;
                     console.error("Błąd weryfikacji w tle:", err);
+
+                    const fallbackQ: QuestionResponse = {
+                        ...nextQ, 
+                        sourceUrl: "null", 
+                        trivia: "null"
+                    };
+
+                    this.questionsList.push(fallbackQ);
                     this.loadQuestions(sessionId, count, currentCount + 1);
                 }
             });
@@ -214,6 +225,7 @@ startGame() {
           error: (e) => {
             if (!this.isGameActive) return;
             console.error(`❌ Generating question error #${currentCount + 1}:`, e);
+            this.loadQuestions(sessionId, count, currentCount + 1);
           }
         });
   }
@@ -266,35 +278,53 @@ startGame() {
     this.showAnswerCard = true;
 }
 
-
-  handleNextQuestion() {
+handleNextQuestion() {
+    // 1. Sprawdzenie końca gry
     if (this.currentQuestionIndex >= 6) { 
        this.finishGame();
        return;
     }
+
+    this.isLoading = true; 
+
+    const nextIndex = this.currentQuestionIndex + 1;
+
+    if (this.questionsList.length > nextIndex && this.questionsList[nextIndex]) {
+        console.log("⏩ [Frontend] Używam pytania z cache (załadowanego w tle).");
+        this.advanceToQuestion(this.questionsList[nextIndex]);
+        return;
+    } 
+
+    console.log("⏳ [Frontend] Brak pytania w cache. Pytam backend...");
+    
     this.quizService.getNextQuestion().subscribe({
       next: (nextQuestionFromBackend) => {
-        console.log("⏩ Backend potwierdził zmianę. Nowe pytanie:", nextQuestionFromBackend);
-
-        this.currentQuestionIndex++;
-        
-        this.currentQuestion = nextQuestionFromBackend;
-        if (!this.questionsList[this.currentQuestionIndex]) {
-           this.questionsList.push(nextQuestionFromBackend);
-        } else {
-           this.questionsList[this.currentQuestionIndex] = nextQuestionFromBackend;
-        }
-
-        this.showAnswerCard = false;
-        this.showQuestionCard = true;
+        console.log("⏩ [Frontend] Pytanie pobrane z serwera:", nextQuestionFromBackend);
+        this.questionsList.push(nextQuestionFromBackend);
+        this.advanceToQuestion(nextQuestionFromBackend);
       },
       error: (err) => {
-        console.error("Błąd przesuwania pytania:", err);
-
+        console.error("❌ [Frontend] Błąd pobierania nextQuestion:", err);
+        this.isLoading = false;
+        
+        this.errorMessage = this.languageService.currentLang() === 'pl' 
+            ? "Nie udało się pobrać kolejnego pytania." 
+            : "Could not retrieve the next question.";
+        this.showError = true;
       }
     });
   }
 
+  private advanceToQuestion(question: QuestionResponse) {
+      this.currentQuestionIndex++;
+      this.currentQuestion = question;
+      
+      this.showAnswerCard = false;
+      this.showQuestionCard = true;
+      
+      this.isLoading = false; // Wyłączamy loader dopiero gdy wszystko gotowe
+  }
+  
   finishGame()
   {
     this.showQuestionCard = false;
@@ -342,4 +372,8 @@ cancelExit()
   this.showExitConfirmation = false;
 }
 
+closeErrorModal() {
+    this.showError = false;
+    this.exitGame(); 
+  }
 }

@@ -129,4 +129,26 @@
     (cancel)="cancelExit()">
 </app-confirmation-pop-up>
 
+<div *ngIf="showError" class="fixed inset-0 z-[10000] flex items-center justify-center bg-white/30 backdrop-blur-sm">
+  <div class="bg-white/90 p-8 rounded-3xl shadow-xl border-2 border-white max-w-sm w-full text-center mx-4">
+    
+    <div class="text-5xl mb-4">⚠️</div>
+    
+    <h3 class="text-purple-900 text-xl font-bold mb-2">
+      {{ languageService.t().sthWentWrong }}
+    </h3>
+    
+    <p class="text-purple-800 mb-6 leading-relaxed">
+      {{ errorMessage }}
+    </p>
+    
+    <button 
+      (click)="closeErrorModal()"
+      class="bg-gradient-to-r from-purple-400 to-pink-400 text-white font-bold py-2 px-6 rounded-full shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+    >
+      OK
+    </button>
+  </div>
+</div>
+
 </div>
