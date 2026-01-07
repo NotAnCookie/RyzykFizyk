@@ -37,55 +37,116 @@ class SessionManager:
         self.sessions[session.id] = session
         return session
     
+    async def _collect_remaining_tasks(self, session: GameSession, pending_tasks):
+        """
+        Ta funkcja czeka na pozostałe zadania, które nie zdążyły być 'pierwsze'.
+        Gdy tylko skończą, dodaje je do listy.
+        """
+        print(f"🏃 [RACE] Czekam na {len(pending_tasks)} pozostałych pytań w tle...")
+        
+        try:
+            # as_completed pozwala przetwarzać zadania w miarę ich kończenia (nie po kolei!)
+            for completed_task in asyncio.as_completed(pending_tasks):
+                try:
+                    question = await completed_task
+                    if question:
+                        # Nadajemy ID dynamicznie
+                        question.id = len(session.questions) + 1
+                        session.questions.append(question)
+                        print(f"✅ [RACE] Dodano kolejne pytanie (ID: {question.id})")
+                except Exception as e:
+                    print(f"⚠️ [RACE] Błąd w zadaniu tła: {e}")
+                    
+        except Exception as e:
+            print(f"❌ [RACE] Błąd pętli zbierającej: {e}")
+
     async def start_session(self, session_id: int) -> GameSession:
         session = self.sessions[session_id]
         session.state = SessionState.LOADING
-
-        # KROK 1: Generujemy Q1 (Blokujemy użytkownika na te 3-5s, bo musi mieć co robić)
-        # Używamy _generate_single_complete_question, żeby Q1 też miało od razu trivię!
-        first_q = await self._generate_single_complete_question(session, 0)
         
+        TOTAL_QUESTIONS = 7
+        
+        print(f"🏁 [START] Wystrzeliwuję {TOTAL_QUESTIONS} zapytań do AI JEDNOCZEŚNIE...")
+
+        # A. Tworzymy listę zadań (Future objects), ale ich nie czekamy (await)
+        tasks = [
+            asyncio.create_task(self._generate_single_complete_question(session, TOTAL_QUESTIONS))
+            for _ in range(TOTAL_QUESTIONS)
+        ]
+
+        # B. Czekamy na PIERWSZEGO gotowego (FIRST_COMPLETED)
+        done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+
+        first_task = done.pop() # Pobieramy zakończone zadanie
+        first_q = first_task.result() # Pobieramy wynik
+
+
         if not first_q:
-             raise HTTPException(status_code=503, detail="Failed to start game.")
+            print("⚠️ [RACE] Najszybsze pytanie było puste! Czekam na kolejne...")
+
+            raise HTTPException(status_code=503, detail="Błąd generatora AI (Empty Race).")
 
         first_q.id = 1
         session.questions.append(first_q)
+        print(f"🥇 [WINNER] Mamy pierwsze pytanie! Zwracam je do gracza.")
 
-        # KROK 2: Resztę (5 pytań) puszczamy w tle
-        # UWAGA: create_task powoduje, że Python NIE CZEKA tutaj na wynik.
-        # Python idzie do następnej linijki (return) natychmiast.
-        asyncio.create_task(self._prefill_questions_background(session_id, 6))
+        if pending:
+            asyncio.create_task(self._collect_remaining_tasks(session, pending))
 
         session.state = SessionState.IN_PROGRESS
         session.currentQuestion += 1
         
-        # KROK 3: Zwracamy sesję. Gracz gra.
-        # W międzyczasie w tle mieli się 5 wątków. Zanim gracz odpowie na Q1, 
-        # Q2-Q6 będą już gotowe w liście session.questions.
         return session
     
-
-    
-    # async def start_session2(self, session_id: int) -> GameSession:
+    # async def start_session(self, session_id: int) -> GameSession:
     #     session = self.sessions[session_id]
-
     #     session.state = SessionState.LOADING
 
-    #     # generujemy pierwsze pytanie
-    #     generated_q = self.question_generator.generate_question(
-    #         category=session.category,
-    #         language=session.language
-    #     )
-
+    #     # KROK 1: Generujemy Q1 (Blokujemy użytkownika na te 3-5s, bo musi mieć co robić)
+    #     # Używamy _generate_single_complete_question, żeby Q1 też miało od razu trivię!
+    #     first_q = await self._generate_single_complete_question(session, 0)
         
-    #     first_question = map_generated_question_to_global(generated_q)
-    #     first_question.id = len(session.questions) + 1
+    #     if not first_q:
+    #          raise HTTPException(status_code=503, detail="Failed to start game.")
 
-    #     session.questions.append(first_question)
+    #     first_q.id = 1
+    #     session.questions.append(first_q)
+
+    #     # KROK 2: Resztę (5 pytań) puszczamy w tle
+    #     # UWAGA: create_task powoduje, że Python NIE CZEKA tutaj na wynik.
+    #     # Python idzie do następnej linijki (return) natychmiast.
+    #     asyncio.create_task(self._prefill_questions_background(session_id, 6))
 
     #     session.state = SessionState.IN_PROGRESS
-    #     session.currentQuestion+=1
+    #     session.currentQuestion += 1
+        
+    #     # KROK 3: Zwracamy sesję. Gracz gra.
+    #     # W międzyczasie w tle mieli się 5 wątków. Zanim gracz odpowie na Q1, 
+    #     # Q2-Q6 będą już gotowe w liście session.questions.
     #     return session
+    
+
+    
+    # # async def start_session2(self, session_id: int) -> GameSession:
+    # #     session = self.sessions[session_id]
+
+    # #     session.state = SessionState.LOADING
+
+    # #     # generujemy pierwsze pytanie
+    # #     generated_q = self.question_generator.generate_question(
+    # #         category=session.category,
+    # #         language=session.language
+    # #     )
+
+        
+    # #     first_question = map_generated_question_to_global(generated_q)
+    # #     first_question.id = len(session.questions) + 1
+
+    # #     session.questions.append(first_question)
+
+    # #     session.state = SessionState.IN_PROGRESS
+    # #     session.currentQuestion+=1
+    # #     return session
 
     
     async def get_next_question(self, session_id: int):
@@ -100,10 +161,7 @@ class SessionManager:
 
         # Generujemy kolejne pytanie tylko wtedy, gdy brakuje do MAX_QUESTIONS
         if indx < MAX_QUESTIONS:
-            new_generated_q = self.question_generator.generate_question(
-                language=session.language,
-                category=session.category
-            )
+            new_generated_q = await self._generate_single_complete_question(session, 1)
 
             if new_generated_q:
                 # mapujemy na globalny model Question

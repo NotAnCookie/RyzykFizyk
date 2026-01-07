@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, effect } from '@angular/core';
+import { Component, inject, OnInit, effect, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { FormsModule } from '@angular/forms'; 
 import { SettingsComponent } from '../settings/settings.component';
@@ -276,6 +276,8 @@ startGame() {
       };
 
     this.showAnswerCard = true;
+    this.showQuestionCard=false;
+
 }
 
 handleNextQuestion() {
@@ -375,5 +377,22 @@ cancelExit()
 closeErrorModal() {
     this.showError = false;
     this.exitGame(); 
+  }
+
+  @HostListener('document:keydown.enter', ['$event'])
+  handleEnterKey(event: KeyboardEvent) {
+    if (this.showQuestionCard && !this.isLoading) {
+     this.showAnswerCard = true;
+     this.showQuestionCard = false;
+     this.showAnswer();
+    }
+    else if(this.showAnswerCard && !this.isLoading)
+    {
+      this.handleNextQuestion();
+    }
+    else if(this.showGameSummary)
+    {
+      this.showGameSummary = false;
+    }
   }
 }

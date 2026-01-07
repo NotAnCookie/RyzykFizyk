@@ -71,31 +71,6 @@ QUESTION_PROMPT_TEMPLATE = {
     ),
 }
 
-RELEVANCE_PROMPT_TEMPLATE = {
-    "pl": (
-        "Jesteś surowym sędzią kategorii. Twoim zadaniem jest ocena, czy dany TEMAT pasuje do KATEGORII.\n"
-        "Kategoria: '{category_name}'\n"
-        "Temat do oceny: '{topic}'\n\n"
-        "ZASADY:\n"
-        "1. Zwróć FALSE, jeśli temat to fikcja (film, gra, postać fikcyjna), a kategoria jest naukowa/geograficzna.\n"
-        "2. Zwróć FALSE, jeśli temat to 'Lista...', 'Spis...', 'Kalendarium...' lub 'Ujednoznacznienie'.\n"
-        "3. Zwróć FALSE, jeśli temat jest ewidentnie z innej dziedziny (np. 'Madonna (piosenkarka)' w kategorii 'Geografia').\n"
-        "4. Jeśli temat brzmi wiarygodnie dla tej kategorii -> Zwróć TRUE.\n\n"
-        "Zwróć TYLKO JSON: {{ \"is_relevant\": true }} lub {{ \"is_relevant\": false }}"
-    ),
-    "en": (
-        "You are a strict category judge. Evaluate if the TOPIC fits the CATEGORY.\n"
-        "Category: '{category_name}'\n"
-        "Topic to evaluate: '{topic}'\n\n"
-        "RULES:\n"
-        "1. Return FALSE if topic is fiction (movie, game) but category is scientific/geographic.\n"
-        "2. Return FALSE for Lists, Timelines, or Disambiguations.\n"
-        "3. Return FALSE if the topic clearly belongs to another field.\n"
-        "4. If likely relevant -> Return TRUE.\n\n"
-        "Return ONLY JSON: {{ \"is_relevant\": true }} or {{ \"is_relevant\": false }}"
-    )
-}
-
 class QuestionGenerator:
     def __init__(self):
         api_key = os.getenv("OPENAI_API_KEY")
