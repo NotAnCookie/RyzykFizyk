@@ -8,7 +8,7 @@ import { QuestionAnswerCardComponent } from '../question-answer-card/question-an
 import { GameSummaryComponent } from '../game-summary/game-summary.component';
 import { QuizService, CategoryResponse } from '../services/quiz.service';
 import { QuestionResponse } from '../models/question.model';
-import { producerUpdatesAllowed } from '@angular/core/primitives/signals';
+// removed unused import
 import { LanguageService } from '../services/language.service';
 import { LoadingScreenComponent } from '../loading-screen/loading-screen.component';
 import { ConfirmationPopUpComponent } from '../confirmation-pop-up/confirmation-pop-up.component';
@@ -29,7 +29,7 @@ import { Subscription } from 'rxjs';
     ConfirmationPopUpComponent,
   ],
   templateUrl: './landing-page.component.html',
-  styleUrl: './landing-page.component.css'
+  styleUrls: ['./landing-page.component.css']
 })
 export class LandingPageComponent implements OnInit {
   
@@ -333,7 +333,6 @@ handleNextQuestion() {
     this.showAnswerCard = false;
     this.showGameSummary = true;
     this.quizService.endSession().subscribe(); 
-
   }
 
   exitGame() {
@@ -355,13 +354,12 @@ handleNextQuestion() {
   this.showAnswerCard = false;
   this.questionsList = []; 
   this.currentQuestionIndex = 0;
-  this.selectedCategory = ""; 
+  this.selectedCategory = this.categories[0].id;
   }
 
   cancelLoading() {
     this.isLoading = false;
     this.exitGame();
-
 }
 
 backToMenu()
@@ -373,6 +371,28 @@ cancelExit()
 {
   this.showExitConfirmation = false;
 }
+
+  // Handle Tab / Shift+Tab on category buttons: cycle selection and focus among categories only
+  handleCategoryTab(event: KeyboardEvent, idx: number) {
+    if (event.key !== 'Tab') return;
+
+    event.preventDefault();
+
+    const len = this.categories?.length || 0;
+    if (len === 0) return;
+
+    let newIdx: number;
+    if (event.shiftKey) {
+      newIdx = (idx - 1 + len) % len;
+    } else {
+      newIdx = (idx + 1) % len;
+    }
+
+    this.selectedCategory = this.categories[newIdx].id;
+
+    const el = document.getElementById('category-btn-' + newIdx) as HTMLElement | null;
+    el?.focus();
+  }
 
 closeErrorModal() {
     this.showError = false;
@@ -393,6 +413,10 @@ closeErrorModal() {
     else if(this.showGameSummary)
     {
       this.showGameSummary = false;
+    }
+    else if(!this.isGameActive)
+    {
+      this.startGame();
     }
   }
 }

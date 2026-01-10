@@ -19,6 +19,9 @@ class SessionManager:
         # aktywne sesje
         self.sessions: dict[int, GameSession] = {}
 
+        # track background prefill tasks per session to avoid duplicates
+        self._prefill_tasks: dict[int, asyncio.Task] = {}
+
     def create_session(self, player: Player, language: Language, category_id: str) -> GameSession:
 
         if category_id not in CATEGORIES_CONFIG:
@@ -93,10 +96,27 @@ class SessionManager:
         if pending:
             asyncio.create_task(self._collect_remaining_tasks(session, pending))
 
+            # If we don't yet have the full set of questions, start prefill for the remaining
+            remaining = max(0, TOTAL_QUESTIONS - len(session.questions))
+            if remaining > 0 and session.id not in self._prefill_tasks:
+                self._start_prefill_task(session.id, remaining)
+
         session.state = SessionState.IN_PROGRESS
         session.currentQuestion += 1
         
         return session
+
+    def _start_prefill_task(self, session_id: int, count: int):
+        """Start a background prefill for the session if not already running."""
+        if session_id in self._prefill_tasks:
+            return
+
+        task = asyncio.create_task(self._prefill_questions_background(session_id, count))
+        self._prefill_tasks[session_id] = task
+
+        def _on_done(t):
+            self._prefill_tasks.pop(session_id, None)
+        task.add_done_callback(_on_done)
     
     # async def start_session(self, session_id: int) -> GameSession:
     #     session = self.sessions[session_id]
@@ -157,14 +177,34 @@ class SessionManager:
         # Jeśli są pytania do wykorzystania
         if indx < len(session.questions):
             q = session.questions[indx]
+
+            # If we don't yet have the full set of questions, start background prefill
+            if len(session.questions) < MAX_QUESTIONS and session.id not in self._prefill_tasks:
+                self._start_prefill_task(session.id, MAX_QUESTIONS - len(session.questions))
+
             return q
 
-        # Generujemy kolejne pytanie tylko wtedy, gdy brakuje do MAX_QUESTIONS
+        # Jeśli brakuje pytań a nie osiągnięto MAX_QUESTIONS -> uruchom prefill tła, poczekaj krótko
         if indx < MAX_QUESTIONS:
+            # Start background prefill for remaining questions if not already running
+            if session.id not in self._prefill_tasks:
+                self._start_prefill_task(session.id, MAX_QUESTIONS - len(session.questions))
+
+            # Wait briefly for background prefill to add at least one question
+            timeout = 3.0
+            poll = 0.1
+            waited = 0.0
+            while indx >= len(session.questions) and waited < timeout:
+                await asyncio.sleep(poll)
+                waited += poll
+
+            if indx < len(session.questions):
+                return session.questions[indx]
+
+            # Fallback: synchronously generate one question so the caller is not blocked
             new_generated_q = await self._generate_single_complete_question(session, 1)
 
             if new_generated_q:
-                # mapujemy na globalny model Question
                 new_question = map_generated_question_to_global(new_generated_q)
                 new_question.id = len(session.questions) + 1
 
@@ -341,18 +381,22 @@ class SessionManager:
 
         tasks = [self._generate_single_complete_question(session, i) for i in range(count)]
         
-        # Uruchamiamy WSZYSTKIE naraz i czekamy aż wszystkie spłyną
+        # Run them concurrently and wait for results
         results = await asyncio.gather(*tasks)
 
-        # Filtrujemy None (nieudane próby)
+        # Filter out failures
         valid_questions = [q for q in results if q is not None]
 
-        current_len = len(session.questions)
-        for i, q in enumerate(valid_questions):
-            q.id = current_len + i + 1
+        for q in valid_questions:
+            # Stop if we've already reached the MAX_QUESTIONS (race-safety)
+            if len(session.questions) >= MAX_QUESTIONS:
+                print(f"⚠️ [PREFILL] Osiągnięto limit pytań, pomijam nadmiar")
+                break
+
+            q.id = len(session.questions) + 1
             session.questions.append(q)
             print(f"✅ [PREFILL] Dodano gotowe pytanie ID: {q.id}")
 
-        print(f"🏁 [PREFILL] Zakończono! Dodano {len(valid_questions)} pytań. Razem w sesji: {len(session.questions)}")
+        print(f"🏁 [PREFILL] Zakończono! Razem w sesji: {len(session.questions)}")
 
 
