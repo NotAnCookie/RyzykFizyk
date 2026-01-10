@@ -412,7 +412,7 @@ closeErrorModal() {
     }
     else if(this.showGameSummary)
     {
-      this.showGameSummary = false;
+      this.exitGame();
     }
     else if(!this.isGameActive)
     {
