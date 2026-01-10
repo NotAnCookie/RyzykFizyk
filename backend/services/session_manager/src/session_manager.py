@@ -11,10 +11,11 @@ import asyncio
 
 class SessionManager:
 
-    def __init__(self, question_generator, verify_service, trivia_service):
+    def __init__(self, question_generator, verify_service, trivia_service, combined_generator=None):
         self.question_generator = question_generator
         self.verify_service = verify_service
         self.trivia_service = trivia_service
+        self.combined_generator = combined_generator
 
         # aktywne sesje
         self.sessions: dict[int, GameSession] = {}
@@ -178,13 +179,13 @@ class SessionManager:
         if indx < len(session.questions):
             q = session.questions[indx]
 
-            # If we don't yet have the full set of questions, start background prefill
+            # Ensure background prefill is running for the remaining questions
             if len(session.questions) < MAX_QUESTIONS and session.id not in self._prefill_tasks:
                 self._start_prefill_task(session.id, MAX_QUESTIONS - len(session.questions))
 
             return q
 
-        # Jeśli brakuje pytań a nie osiągnięto MAX_QUESTIONS -> uruchom prefill tła, poczekaj krótko
+        # Jeśli brakuje pytań a nie osiągnięto MAX_QUESTIONS -> uruchom prefill tła i poczekaj krótko
         if indx < MAX_QUESTIONS:
             # Start background prefill for remaining questions if not already running
             if session.id not in self._prefill_tasks:
@@ -198,22 +199,56 @@ class SessionManager:
                 await asyncio.sleep(poll)
                 waited += poll
 
+            # If background prefill added the question while we were waiting, return it
             if indx < len(session.questions):
                 return session.questions[indx]
 
-            # Fallback: synchronously generate one question so the caller is not blocked
-            new_generated_q = await self._generate_single_complete_question(session, 1)
+            # Fallback: try synchronous generation with retries so the caller is not blocked
+            max_attempts = 5
+            attempt = 0
+            backoff = 0.2
+            generated = None
 
-            if new_generated_q:
-                new_question = map_generated_question_to_global(new_generated_q)
-                new_question.id = len(session.questions) + 1
+            while attempt < max_attempts:
+                attempt += 1
+                new_generated_q = await self._generate_single_complete_question(session, 1)
 
-                session.questions.append(new_question)
-                return new_question
+                # If prefill filled the slot while we were generating, prefer that
+                if indx < len(session.questions):
+                    return session.questions[indx]
+
+                if new_generated_q:
+                    # If there's still room, append and return
+                    if len(session.questions) < MAX_QUESTIONS:
+                        new_generated_q.id = len(session.questions) + 1
+                        session.questions.append(new_generated_q)
+                        return new_generated_q
+
+                    # If we cannot append because the session is already full, try to return existing question
+                    if indx < len(session.questions):
+                        return session.questions[indx]
+
+                    # Unexpected race: break and mark as exhausted
+                    break
+
+                # nothing generated this attempt — wait briefly and retry
+                await asyncio.sleep(backoff)
+
+            # After retries, check again if prefill produced the question
+            if indx < len(session.questions):
+                return session.questions[indx]
+
+            # After attempts exhausted, mark summary and return None
+            session.currentQuestion = MAX_QUESTIONS
+            session.state = SessionState.SUMMARY
+            return None
 
         # Jeżeli osiągnięto limit pytań
+        session.currentQuestion = MAX_QUESTIONS
         session.state = SessionState.SUMMARY
         return None
+    
+
 
     async def generate_background_question(self, session_id: int):
         session = self.sessions.get(session_id)
@@ -324,7 +359,27 @@ class SessionManager:
 
     async def _generate_single_complete_question(self, session: GameSession, index_offset: int):
         try:
-            # A. Generowanie treści (Tekst + Odpowiedź)
+            # If a combined generator is available, use it to make a single OpenAI call
+            if self.combined_generator:
+                print("🔗 [COMBINED] Using combined generator to create question + trivia in one call.")
+                combined_res = await asyncio.to_thread(self.combined_generator.generate, session.category, session.language)
+                if not combined_res:
+                    print("⚠️ [COMBINED] Combined generator returned None.")
+                    return None
+
+                gen_q, trivia_res = combined_res
+
+                question = map_generated_question_to_global(gen_q)
+
+                # attach trivia and source if present
+                if trivia_res:
+                    question.trivia = trivia_res.trivia
+                    if trivia_res.source and getattr(trivia_res.source, 'url', None):
+                        question.sourceUrl = trivia_res.source.url
+
+                return question
+
+            # A. Generowanie treści (Tekst + Odpowiedź) using the old separate question generator
             generated_q = await asyncio.to_thread(
                 self.question_generator.generate_question,
                 category=session.category,
