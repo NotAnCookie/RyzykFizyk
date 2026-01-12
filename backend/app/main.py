@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 import os
 from services.question_generator.src.questions_generator import QuestionGenerator
 from services.trivia_generator.src.generator.trivia_generator import TriviaGenerator
-from services.combined_generator.src.combined_generator import CombinedGenerator
 from fastapi.middleware.cors import CORSMiddleware
 
 # Generator pytań
@@ -15,8 +14,6 @@ question_generator = QuestionGenerator()
 # Generator ciekawostek (still available if needed)
 trivia_service = TriviaGenerator()
 
-# Combined generator to reduce OpenAI calls
-combined_generator = CombinedGenerator()
 
 load_dotenv()
 #print("---------------------------------------------------------------------------------DEBUG: OPENAI_API_KEY =", os.getenv("OPENAI_API_KEY"))
@@ -42,7 +39,6 @@ session_manager = SessionManager(
     question_generator=question_generator,
     verify_service=verify_service,
     trivia_service=trivia_service,
-    combined_generator=combined_generator
 )
 
 app.include_router(questions.router)
