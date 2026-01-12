@@ -20,6 +20,7 @@ class QuestionGenerator:
             raise ValueError("❌ Brak klucza OPENAI_API_KEY w pliku .env")
         
         self.client = OpenAI(api_key=api_key)
+        self.seen_titles = set()
 
     def resolve_category(self, category_id: str, language: Language) -> WikiCategory:
         main_config = CATEGORIES_CONFIG.get(category_id)
@@ -59,6 +60,36 @@ class QuestionGenerator:
             
         except Exception:
             return None
+        
+    def get_random_titles_batch(self, category: WikiCategory, language: Language) -> list[str]:
+        """
+        Pobiera paczkę losowych tytułów dla danej kategorii.
+        Robi to RAZ, żeby nie strzelać do API wyszukiwania w kółko.
+        """
+        if not category.keywords:
+            return []
+        
+        keyword = random.choice(category.keywords)
+        print(f" 🔍 [Wiki Search] Szukam tematów dla hasła: '{keyword}'...")
+
+        try:
+            results = wikipedia.search(keyword, results=50)
+            if not results:
+                return []
+            
+            unique_results = list(set(results))
+            random.shuffle(unique_results)
+
+            available_titles = [t for t in unique_results if t not in self.seen_titles]
+            
+            if not available_titles:
+                available_titles = unique_results
+
+            return available_titles
+            
+        except Exception as e:
+            print(f"⚠️ Błąd wyszukiwania: {e}")
+            return []
         
     def generate_question_with_ai(self, context_text: str, topic: str, language: Language) -> Optional[dict]:
 
@@ -102,34 +133,38 @@ class QuestionGenerator:
         while attempts < 5:
             attempts += 1
 
-            if not category_obj.keywords:
-                print("DEBUG: Keyword list empty")
-                return None
+            titles_batch = self.get_random_titles_batch(category_obj, language)
+            
+            if not titles_batch:
+                continue 
 
-            title = self.find_article_title(category_obj, language)
-            if not title: continue
 
-            try:
-                page = wikipedia.page(title, auto_suggest=False)
-                content = page.summary
-                content = self.remove_brackets(content)
+            titles_to_check = titles_batch[:15]
 
-                ai_result = self.generate_question_with_ai(content, title, language)
-                
-                if not ai_result or not ai_result.get("question"):
+            for title in titles_to_check:
+                try:
+                    page = wikipedia.page(title, auto_suggest=False)
+                    content = page.summary
+                    content = self.remove_brackets(content)
+
+                    ai_result = self.generate_question_with_ai(content, title, language)
+                    
+                    if not ai_result or not ai_result.get("question"):
+                        continue
+
+                    self.seen_titles.add(title)
+
+                    question_obj = Question(
+                        category=category,
+                        language=language,
+                        question_text=ai_result["question"],
+                        topic=title,
+                        answer=float(ai_result["answer"]),
+
+                    )
+                    return question_obj
+            
+                except (wikipedia.DisambiguationError, wikipedia.PageError):
                     continue
-
-                question_obj = Question(
-                    category=category,
-                    language=language,
-                    question_text=ai_result["question"],
-                    topic=title,
-                    answer=float(ai_result["answer"]),
-
-                )
-                return question_obj
-
-            except (wikipedia.DisambiguationError, wikipedia.PageError):
-                continue
 
         return None
