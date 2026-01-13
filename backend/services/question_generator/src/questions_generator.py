@@ -149,7 +149,7 @@ class QuestionGenerator:
 
                     ai_result = self.generate_question_with_ai(content, title, language)
                     
-                    if not ai_result or not ai_result.get("question"):
+                    if not ai_result or not ai_result.get("question") or not ai_result.get("answer"):
                         continue
 
                     self.seen_titles.add(title)

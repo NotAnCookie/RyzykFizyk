@@ -38,16 +38,8 @@ class SessionManager:
         self.sessions[session.id] = session
         return session
 
-    # --- SERCE SYSTEMU: PIPELINE GENERUJĄCY CAŁOŚĆ ---
     async def _generate_full_question_pipeline(self, session: GameSession):
-        """
-        To jest funkcja 'fabryka'. Nie wypuści pytania, dopóki nie będzie miało
-        kompletu danych (Pytanie + Trivia + Źródło).
-        """
         try:
-            # --- ETAP 1: Generowanie Pytania (Moduł Osoby 2) ---
-            # Musimy poczekać (await), bo bez pytania nie zrobimy reszty.
-            # print(f"🧩 [Pipeline] 1. Generuję bazę pytania...")
             
             generated_q = await asyncio.to_thread(
                 self.question_generator.generate_question,
@@ -57,22 +49,15 @@ class SessionManager:
             
             if not generated_q: return None
             
-            # Mapujemy wynik od Osoby 2 na nasz wspólny model
             question = map_generated_question_to_global(generated_q)
-
-            # --- ETAP 2: Generowanie Dodatków (Moduł Osoby 1) ---
-            # Robimy to RÓWNOLEGLE (Trivia i Źródło robią się naraz)
-            # print(f"🎨 [Pipeline] 2. Dociągam trivię i źródło dla: {question.topic}")
 
             async def get_trivia():
                 if not self.trivia_service: return None
-                # Przekazujemy tekst pytania jako kontekst dla trivii
                 req = TriviaRequest(question_text=question.text, language=session.language)
                 return await asyncio.to_thread(self.trivia_service.generate_trivia, req)
 
             async def get_source():
                 if not self.verify_service: return None
-                # Jeśli Osoba 2 nie podała linku, szukamy go sami
                 if question.sourceUrl: return None 
                 
                 req = VerificationRequest(
@@ -110,35 +95,26 @@ class SessionManager:
             print(f"❌ Błąd w pipeline: {e}")
             return None
 
-    # --- START SESJI (WYŚCIG KOMPLETNYCH PYTAŃ) ---
     async def start_session(self, session_id: int) -> GameSession:
         session = self.sessions[session_id]
         session.state = SessionState.LOADING
         
         TOTAL_CONCURRENT = 7
-        print(f"🏁 [START] Wyścig {TOTAL_CONCURRENT} pełnych pipeline'ów...")
-
-        # 1. Uruchamiamy 7 niezależnych procesów generowania CAŁOŚCI
         tasks = [
             asyncio.create_task(self._generate_full_question_pipeline(session))
             for _ in range(TOTAL_CONCURRENT)
         ]
 
-        # 2. Czekamy na PIERWSZEGO, który skończy Etap 1 i Etap 2
         done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
         
         first_q = done.pop().result()
 
         if not first_q:
-             # Jeśli pierwszy zawiódł, w produkcji warto sprawdzić 'done' pod kątem błędów
              raise HTTPException(status_code=503, detail="Nie udało się wygenerować pytania startowego.")
 
-        # 3. Zapisujemy zwycięzcę (ma już trivię i źródło!)
         first_q.id = 1
         session.questions.append(first_q)
-        print(f"🥇 [WINNER] Mamy kompletne pytanie! ID: {first_q.id}")
 
-        # 4. Reszta procesów kończy się w tle i zapełnia bufor (Pre-filling)
         asyncio.create_task(self._collect_remaining_tasks(session, pending))
 
         session.state = SessionState.IN_PROGRESS
