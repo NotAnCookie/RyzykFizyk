@@ -28,7 +28,45 @@
 
         <div class="h-[1px] w-full bg-purple-200/50"></div>
 
-        <div class="space-y-2"></div>
+        <h3 class="text-purple-900">{{languageService.t().theme}}</h3>
+        
+        <div class="h-[1px] w-full bg-purple-200/50"></div>
+        
+        <div class="space-y-2">
+          <button
+            (click)="selectTheme('light')"
+            class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all"
+            [ngClass]="{
+              'bg-purple-200/50 border-2 border-purple-300': currentTheme === 'light',
+              'bg-white/50 border-2 border-transparent hover:border-purple-200': currentTheme !== 'light'
+            }"
+          >
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">☀️</span>
+              <span class="text-purple-900">{{languageService.t().lightMode}}</span>
+            </div>
+
+            <span *ngIf="currentTheme === 'light'" class="text-purple-600 font-bold text-xl">✓</span>
+          </button>
+          
+          <button
+            (click)="selectTheme('dark')"
+            class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all"
+            [ngClass]="{
+              'bg-purple-200/50 border-2 border-purple-300': currentTheme === 'dark',
+              'bg-white/50 border-2 border-transparent hover:border-purple-200': currentTheme !== 'dark'
+            }"
+          >
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">🌙</span>
+              <span class="text-purple-900">{{languageService.t().darkMode}}</span>
+            </div>
+
+            <span *ngIf="currentTheme === 'dark'" class="text-purple-600 font-bold text-xl">✓</span>
+          </button>
+        </div>
+
+        <div class="h-[1px] w-full bg-purple-200/50"></div>
             <button (click)= "handleClose()"
             class="
             w-full

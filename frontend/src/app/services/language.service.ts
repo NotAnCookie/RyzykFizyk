@@ -29,6 +29,9 @@ export interface Translations {
   cancel: string;
   sthWentWrong: string;
   connectionError: string;
+  theme: string;
+  darkMode: string;
+  lightMode: string;
 }
 
 @Injectable({
@@ -64,7 +67,11 @@ export class LanguageService {
     language: "Language",
     cancel: "Cancel", 
     sthWentWrong: "Oops, something went wrong...",
-    connectionError: "Connection Error"
+    connectionError: "Connection Error",
+    theme: "Theme",
+    darkMode: "Dark Mode",
+    lightMode: "Light Mode"
+
   },
   pl: {
     startGame: "Rozpocznij Grę",
@@ -86,7 +93,10 @@ export class LanguageService {
     language: "Język",
     cancel: "Anuluj",
     sthWentWrong: "Ups, coś poszło nie tak...",
-    connectionError: "Błąd Połączenia"
+    connectionError: "Błąd Połączenia",
+    theme: "Motyw",
+    darkMode: "Tryb Ciemny",
+    lightMode: "Tryb Jasny"
   }
 };
 

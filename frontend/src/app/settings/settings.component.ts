@@ -15,9 +15,16 @@ export class SettingsComponent {
 
   @Output() close = new EventEmitter<void>();
 
+  currentTheme: 'light' | 'dark' = 'light';
+
   selectLanguage(code: LanguageCode)
   {
     this.languageService.setLanguage(code);
+  }
+
+  selectTheme(theme: 'light' | 'dark') {
+    this.currentTheme = theme;
+    // Here you could add logic to actually apply the theme
   }
 
   handleClose()

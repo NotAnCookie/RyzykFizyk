@@ -18,10 +18,10 @@
       <h1 class="fancy-title text-purple-900/80 mb-8 text-5xl md:text-6xl lg:text-7xl">Risky Physics</h1>
       
       <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-lg border-2 border-white">
-        <h3 class="text-purple-900 mb-6"> {{languageService.t().chooseCategory}} </h3>
+        <h3 class="text-purple-900 text-2xl mb-6"> {{languageService.t().chooseCategory}} </h3>
         
         
-<div class="space-y-4">
+<div class="space-y-4 px-2 mb-6">
   <button
     *ngFor="let category of categories; let isLast = last; let isFirst = first; let idx = index"
     type="button"
@@ -49,8 +49,6 @@
     </span>
   </button>
 </div>
-      
-      </div>
 
       <button 
         size="lg"
@@ -59,6 +57,8 @@
       >
         {{languageService.t().startGame}}
       </button>
+      
+      </div>
     </div>
   </main>
 
