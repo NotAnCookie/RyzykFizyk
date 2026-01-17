@@ -1,6 +1,7 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LanguageService } from '../services/language.service';
+import { ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-confirmation-pop-up',
@@ -12,6 +13,7 @@ import { LanguageService } from '../services/language.service';
 export class ConfirmationPopUpComponent {
   
   public languageService = inject(LanguageService);
+  public themeService = inject(ThemeService);
 
   @Output() confirm = new EventEmitter<void>(); // Użytkownik kliknął TAK
   @Output() cancel = new EventEmitter<void>();  // Użytkownik kliknął NIE

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { QuestionResponse } from "../models/question.model";
 import { LanguageService } from '../services/language.service';
+import { ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-question-answer-card',
@@ -14,6 +15,8 @@ import { LanguageService } from '../services/language.service';
 export class QuestionAnswerCardComponent {
 
   protected languageService = inject(LanguageService);
+  public themeService = inject(ThemeService);
+  
   @Input() question!: QuestionResponse;
 
   @Output() back = new EventEmitter<void>();

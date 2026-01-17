@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms'; 
 import { QuestionResponse } from "../models/question.model";
 import { LanguageService } from '../services/language.service';
+import { ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-question-card',
@@ -13,7 +14,8 @@ import { LanguageService } from '../services/language.service';
 })
 export class QuestionCardComponent {
   protected languageService = inject(LanguageService);
-
+  public themeService = inject(ThemeService);
+  
   @Input() question!: QuestionResponse;
   @Input() currentQuestionIndex: number = 0;
   @Input() totalQuestions: number = 0;

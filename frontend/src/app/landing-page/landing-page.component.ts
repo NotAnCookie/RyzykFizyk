@@ -10,6 +10,7 @@ import { QuizService, CategoryResponse } from '../services/quiz.service';
 import { QuestionResponse } from '../models/question.model';
 // removed unused import
 import { LanguageService } from '../services/language.service';
+import { ThemeService } from '../services/theme.service';
 import { LoadingScreenComponent } from '../loading-screen/loading-screen.component';
 import { ConfirmationPopUpComponent } from '../confirmation-pop-up/confirmation-pop-up.component';
 import { Subscription } from 'rxjs';
@@ -35,6 +36,7 @@ export class LandingPageComponent implements OnInit {
   
   private quizService = inject(QuizService);
   public languageService = inject(LanguageService);
+  public themeService = inject(ThemeService);
 
   isGameActive: boolean = false; 
   private backgroundSub: Subscription | null = null;

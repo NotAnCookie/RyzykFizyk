@@ -1,14 +1,20 @@
-<div class="overlay">
-    <div class="modal-card">
-        <h3>{{ t.title }}</h3>
-        <p>{{ t.message }}</p>
+<div class="overlay" [class.dark-overlay]="themeService.getCurrentTheme()() === 'dark'">
+    
+    <div class="modal-card" [class.dark-modal-card]="themeService.getCurrentTheme()() === 'dark'">
+        
+        <h3 [class.dark-h3]="themeService.getCurrentTheme()() === 'dark'">{{ t.title }}</h3>
+        <p [class.dark-p]="themeService.getCurrentTheme()() === 'dark'">{{ t.message }}</p>
         
         <div class="buttons">
-            <button class="btn-cancel" (click)="cancel.emit()">
+            <button class="btn-cancel" 
+                    [class.dark-btn-cancel]="themeService.getCurrentTheme()() === 'dark'" 
+                    (click)="cancel.emit()">
                 {{ t.no }}
             </button>
             
-            <button class="btn-confirm" (click)="confirm.emit()">
+            <button class="btn-confirm" 
+                    [class.dark-btn-confirm]="themeService.getCurrentTheme()() === 'dark'" 
+                    (click)="confirm.emit()">
                 {{ t.yes }}
             </button>
         </div>

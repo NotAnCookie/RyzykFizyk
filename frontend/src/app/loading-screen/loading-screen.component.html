@@ -1,8 +1,8 @@
-<div class="overlay">
-    <div class="spinner"></div>
-    <h2>{{ languageService.t().loading }}</h2>
+<div class="overlay" [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'dark-overlay' : 'light-overlay'">
+    <div class="spinner" [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'dark-spinner' : ''"></div>
+    <h2 [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'dark-h2' : ''">{{ languageService.t().loading }}</h2>
     
-    <button (click)="cancel.emit()">
+    <button [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'dark-button' : ''" (click)="cancel.emit()">
         {{ languageService.t().cancel }}
     </button>
 </div>

@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LanguageService, LanguageCode } from '../services/language.service'; 
+import { LanguageService, LanguageCode } from '../services/language.service';
+import { ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-settings',
@@ -12,10 +13,13 @@ import { LanguageService, LanguageCode } from '../services/language.service';
 export class SettingsComponent {
 
   protected languageService = inject(LanguageService);
+  protected themeService = inject(ThemeService);
 
   @Output() close = new EventEmitter<void>();
 
-  currentTheme: 'light' | 'dark' = 'light';
+  get currentTheme() {
+    return this.themeService.getCurrentTheme();
+  }
 
   selectLanguage(code: LanguageCode)
   {
@@ -23,8 +27,7 @@ export class SettingsComponent {
   }
 
   selectTheme(theme: 'light' | 'dark') {
-    this.currentTheme = theme;
-    // Here you could add logic to actually apply the theme
+    this.themeService.setTheme(theme);
   }
 
   handleClose()

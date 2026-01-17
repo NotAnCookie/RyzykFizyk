@@ -14,6 +14,10 @@
     z-index: 10000; /* Bardzo wysoko */
 }
 
+.dark-overlay {
+    background: rgba(0, 0, 0, 0.6);
+}
+
 /* Karta */
 .modal-card {
     background: rgba(255, 255, 255, 0.9);
@@ -26,16 +30,30 @@
     text-align: center;
 }
 
+.dark-modal-card {
+    background: rgba(31, 41, 55, 0.95);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(75, 85, 99, 0.8);
+}
+
 h3 {
     color: #581c87; /* Purple-900 */
     font-size: 1.5rem;
     margin-bottom: 1rem;
 }
 
+.dark-h3 {
+    color: #cea5f7; /* Purple-300 */
+}
+
 p {
     color: #6b21a8; /* Purple-800 */
     margin-bottom: 2rem;
     line-height: 1.5;
+}
+
+.dark-p {
+    color: #a855f7; /* Purple-400 */
 }
 
 /* Kontener na przyciski */
@@ -70,6 +88,15 @@ button:hover {
     background: #f3e8ff;
 }
 
+.dark-btn-cancel {
+    background: #374151;
+    color: #c084fc;
+    border: 2px solid #6b7280;
+}
+.dark-btn-cancel:hover {
+    background: #4b5563;
+}
+
 /* Przycisk TAK (Niebezpieczny - różowy/czerwony) */
 .btn-confirm {
     background: #c927db; /* Pink-600 */
@@ -79,4 +106,14 @@ button:hover {
 .btn-confirm:hover {
     background: #be185d; /* Pink-700 */
     border-color: #be185d;
+}
+
+.dark-btn-confirm {
+    background: #7c2d12;
+    color: #fca5a5;
+    border: 2px solid #dc2626;
+}
+.dark-btn-confirm:hover {
+    background: #991b1b;
+    border-color: #b91c1c;
 }

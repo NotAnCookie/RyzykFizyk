@@ -23,6 +23,16 @@
   animation: slideIn 0.3s ease-out;
 }
 
+.dark .sheet-content {
+  /* ZMIEŃ transparent NA KONKRETNY KOLOR, np. bardzo ciemny fiolet/szary */
+  background: #0f172a; /* To jest np. slate-900 */
+  background-image: none;
+  
+  border-left: 1px solid #374151; /* ciemniejszy border */
+  color: #e9d5ff; /* Jasny tekst */
+}
+
+
 @keyframes slideIn {
   from {
     transform: translateX(100%);

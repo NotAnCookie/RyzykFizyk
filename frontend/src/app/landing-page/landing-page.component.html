@@ -1,4 +1,4 @@
-<div class="relative min-h-screen bg-gradient-to-r from-purple-300 to-pink-300">
+<div class="relative min-h-screen transition-colors duration-500" [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'bg-gradient-to-br from-slate-950 via-purple-950 to-slate-950' : 'bg-gradient-to-r from-purple-300 via-pink-200 to-purple-300'">
 
   <div *ngIf="!showQuestionCard" class = "min-h-screen flex flex-col">
   <header class="flex justify-end items-center p-6 gap-4">
@@ -7,19 +7,31 @@
       <span>👤</span>
     </button>-->
     
-    <button (click)="openSettings()" class="cursor-pointer h-10 w-10 border-2 border-white shadow-sm hover:shadow-md transition-shadow rounded-full bg-purple-200 text-purple-700 flex items-center justify-center">
-      <span class="text-xl">⚙️</span>
-    </button>
+<button (click)="openSettings()" 
+              class="cursor-pointer h-10 w-10 border-2 shadow-sm hover:shadow-md transition-shadow rounded-full flex items-center justify-center"
+              [ngClass]="themeService.getCurrentTheme()() === 'dark' 
+                ? 'border-white/10 bg-white/5 text-purple-200 hover:bg-white/10' 
+                : 'border-white bg-purple-200 text-purple-700'">
+        <span class="text-xl">⚙️</span>
+      </button>
   </header>
 
   <main class="flex flex-col items-center justify-center px-6" [style.min-height]="'calc(100vh - 88px)'">
 
     <div class="text-center space-y-8 max-w-md w-full">
-      <h1 class="fancy-title text-purple-900/80 mb-8 text-5xl md:text-6xl lg:text-7xl">Risky Physics</h1>
-      
-      <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-lg border-2 border-white">
-        <h3 class="text-purple-900 text-2xl mb-6"> {{languageService.t().chooseCategory}} </h3>
-        
+<h1 class="fancy-title mb-8 text-5xl md:text-6xl lg:text-7xl drop-shadow-lg" 
+            [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'text-purple-50' : 'text-purple-900/80'">
+          Risky Physics
+        </h1>      
+<div class="backdrop-blur-md rounded-3xl p-8 shadow-2xl border-2 transition-colors duration-300" 
+             [ngClass]="themeService.getCurrentTheme()() === 'dark' 
+               ? 'bg-slate-900/60 border-white/10 shadow-black/50' 
+               : 'bg-white/70 border-white'">
+          
+          <h3 class="mb-6 font-semibold tracking-wide" 
+              [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'text-purple-200' : 'text-purple-900'"> 
+              {{languageService.t().chooseCategory}} 
+          </h3>
         
 <div class="space-y-4 px-2 mb-6">
   <button
@@ -32,19 +44,27 @@
     (keydown)="handleCategoryTab($event, idx)"
     
     [class.ring-2]="selectedCategory === category.id"
-    [class.ring-purple-600]="selectedCategory === category.id"
-    [class.bg-purple-100]="selectedCategory === category.id"
+    [ngClass]="{
+      'ring-purple-600 bg-purple-100': selectedCategory === category.id && themeService.getCurrentTheme()() === 'light',
+      'ring-purple-600 bg-purple-800': selectedCategory === category.id && themeService.getCurrentTheme()() === 'dark'
+    }"
     
-    class="w-full flex items-center space-x-3 p-3 rounded-lg border border-purple-300 hover:bg-purple-50 focus:outline-none transition-all text-left"
+    class="w-full flex items-center space-x-3 p-3 rounded-lg border focus:outline-none transition-all text-left"
+    [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'border-purple-700 hover:bg-purple-900 text-purple-200' : 'border-purple-300 hover:bg-purple-50 text-purple-900'"
   >
     <div 
-      class="w-5 h-5 rounded-full border border-purple-600 flex items-center justify-center"
-      [class.bg-white]="selectedCategory !== category.id"
+      class="w-5 h-5 rounded-full border flex items-center justify-center"
+      [ngClass]="{
+        'border-purple-600': themeService.getCurrentTheme()() === 'light',
+        'border-purple-400': themeService.getCurrentTheme()() === 'dark',
+        'bg-white': selectedCategory !== category.id && themeService.getCurrentTheme()() === 'light',
+        'bg-purple-900': selectedCategory !== category.id && themeService.getCurrentTheme()() === 'dark'
+      }"
     >
-      <div *ngIf="selectedCategory === category.id" class="w-3 h-3 rounded-full bg-purple-600"></div>
+      <div *ngIf="selectedCategory === category.id" class="w-3 h-3 rounded-full" [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'bg-purple-300' : 'bg-purple-600'"></div>
     </div>
 
-    <span class="text-purple-900 font-medium flex-1">
+    <span class="font-medium flex-1" [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'text-purple-200' : 'text-purple-900'">
       {{ category.name }}
     </span>
   </button>
@@ -53,7 +73,10 @@
       <button 
         size="lg"
         (click)="startGame()"
-        class="bg-gradient-to-r from-purple-300 to-pink-300 hover:from-purple-400 hover:to-pink-400 text-purple-900 shadow-lg hover:shadow-xl transition-all px-12 py-6 rounded-full"
+        class="shadow-lg hover:shadow-xl transition-all px-12 py-6 rounded-full"
+        [ngClass]="themeService.getCurrentTheme()() === 'dark' ?   
+          'bg-gradient-to-r from-purple-800 to-gray-800 hover:from-purple-700 hover:to-gray-700 text-purple-200' : 
+          'bg-gradient-to-r from-purple-300 to-pink-300 hover:from-purple-400 hover:to-pink-400 text-purple-900'"
       >
         {{languageService.t().startGame}}
       </button>
@@ -90,18 +113,23 @@
  </div>-->
 
 
-<div *ngIf="isSettingsOpen">
+<div *ngIf="isSettingsOpen" [class.dark]="themeService.getCurrentTheme()() === 'dark'">
+  
   <div (click)="isSettingsOpen = false" class="sheet-overlay"></div>
+  
   <div class="sheet-content">
-    <h3 class="text-purple-900 text-lg font-semibold">{{languageService.t().settings}}</h3>
     
+    <h3 [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'text-purple-200' : 'text-purple-900'" class="text-lg font-semibold">
+      {{ languageService.t().settings }}
+    </h3>
+
     <app-settings (close)="isSettingsOpen = false"></app-settings>
     
   </div>
- </div>
+</div>
 </div>
 
-<div *ngIf="showQuestionCard && currentQuestion" class="absolute inset-0 z-10 bg-white">
+<div *ngIf="showQuestionCard && currentQuestion" class="absolute inset-0 z-10">
   <app-question-card 
   [question]="currentQuestion!"
   [currentQuestionIndex] = "currentQuestionIndex + 1"
@@ -112,7 +140,7 @@
 </app-question-card>
 </div>
 
-<div *ngIf="showAnswerCard" class="absolute inset-0 z-10 bg-white">
+<div *ngIf="showAnswerCard" class="absolute inset-0 z-10">
   <app-question-answer-card
     [question]="currentQuestion!"
     [currentQuestionIndex] = "currentQuestionIndex + 1"
@@ -122,7 +150,7 @@
   ></app-question-answer-card>
 </div>
 
-<div *ngIf="showGameSummary" class="absolute inset-0 z-10 bg-white">
+<div *ngIf="showGameSummary" class="absolute inset-0 z-10">
   <app-game-summary
     [questions] = "questionsList"
     (back)="exitGame()"
@@ -130,10 +158,9 @@
   </app-game-summary>
 </div>
 
-<app-loading-screen 
-    *ngIf="isLoading" 
-    (cancel)="cancelLoading()">
-</app-loading-screen>
+<div *ngIf="isLoading" class="fixed inset-0 z-[9999] flex items-center justify-center">
+  <app-loading-screen (cancel)="cancelLoading()"></app-loading-screen>
+</div>
 
 <app-confirmation-pop-up
     *ngIf="showExitConfirmation"
@@ -141,22 +168,33 @@
     (cancel)="cancelExit()">
 </app-confirmation-pop-up>
 
-<div *ngIf="showError" class="fixed inset-0 z-[10000] flex items-center justify-center bg-white/30 backdrop-blur-sm">
-  <div class="bg-white/90 p-8 rounded-3xl shadow-xl border-2 border-white max-w-sm w-full text-center mx-4">
+<div *ngIf="showError" 
+     class="fixed inset-0 z-[10000] flex items-center justify-center backdrop-blur-sm transition-colors duration-300"
+     [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'bg-black/60' : 'bg-white/30'">
+     
+  <div class="p-8 rounded-3xl shadow-xl border-2 max-w-sm w-full text-center mx-4 transition-all"
+       [ngClass]="themeService.getCurrentTheme()() === 'dark' 
+         ? 'bg-slate-900/95 border-purple-700 shadow-black/50' 
+         : 'bg-white/90 border-white'">
     
     <div class="text-5xl mb-4">⚠️</div>
     
-    <h3 class="text-purple-900 text-xl font-bold mb-2">
+    <h3 class="text-xl font-bold mb-2 transition-colors"
+        [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'text-purple-200' : 'text-purple-900'">
       {{ languageService.t().sthWentWrong }}
     </h3>
     
-    <p class="text-purple-800 mb-6 leading-relaxed">
+    <p class="mb-6 leading-relaxed transition-colors"
+       [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'text-purple-300' : 'text-purple-800'">
       {{ errorMessage }}
     </p>
     
     <button 
       (click)="closeErrorModal()"
-      class="bg-gradient-to-r from-purple-400 to-pink-400 text-white font-bold py-2 px-6 rounded-full shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
+      class="font-bold py-2 px-6 rounded-full shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all bg-gradient-to-r"
+      [ngClass]="themeService.getCurrentTheme()() === 'dark' 
+        ? 'from-purple-700 to-pink-700 text-purple-100 hover:from-purple-600 hover:to-pink-600' 
+        : 'from-purple-400 to-pink-400 text-white'"
     >
       OK
     </button>
