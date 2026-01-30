@@ -32,6 +32,7 @@ export interface Translations {
   theme: string;
   darkMode: string;
   lightMode: string;
+  name?: string;
 }
 
 @Injectable({
@@ -70,8 +71,8 @@ export class LanguageService {
     connectionError: "Connection Error",
     theme: "Theme",
     darkMode: "Dark Mode",
-    lightMode: "Light Mode"
-
+    lightMode: "Light Mode",
+    name: "Risk Your Knowledge"
   },
   pl: {
     startGame: "Rozpocznij Grę",
@@ -96,7 +97,8 @@ export class LanguageService {
     connectionError: "Błąd Połączenia",
     theme: "Motyw",
     darkMode: "Tryb Ciemny",
-    lightMode: "Tryb Jasny"
+    lightMode: "Tryb Jasny",
+    name: "Zaryzykuj Swoją Wiedzę"
   }
 };
 

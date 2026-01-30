@@ -21,7 +21,7 @@
     <div class="text-center space-y-8 max-w-md w-full">
 <h1 class="fancy-title mb-8 text-5xl md:text-6xl lg:text-7xl drop-shadow-lg" 
             [ngClass]="themeService.getCurrentTheme()() === 'dark' ? 'text-purple-50' : 'text-purple-900/80'">
-          Risky Physics
+          {{languageService.t().name}}
         </h1>      
 <div class="backdrop-blur-md rounded-3xl p-8 shadow-2xl border-2 transition-colors duration-300" 
              [ngClass]="themeService.getCurrentTheme()() === 'dark' 
