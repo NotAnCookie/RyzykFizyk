@@ -8,8 +8,9 @@ class WikipediaClient:
     def __init__(self, language=Language.PL):
         self.language = language
 
+        # random wymagane info dla wikipedia api
         self.headers = {
-            "User-Agent": "TriviaVerifier/1.0 (agabibek1@gmail.com)"
+            "User-Agent": "TriviaVerifier/1.0 (agabibek2@gmail.com)"
         }
         self.kw_extractor = yake.KeywordExtractor(lan=language.value, n=1, top=1)
 
@@ -23,9 +24,7 @@ class WikipediaClient:
 
 
     def search_page(self, question: str) -> str:
-        """
-        Szuka tytułu strony Wikipedii dla pytania.
-        """
+        # Szuka tytułu strony Wikipedii dla pytania.
         keyword = self.extract_keyword(question)
         print(f"Keyword: {keyword}")
 

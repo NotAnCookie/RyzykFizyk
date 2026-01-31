@@ -17,9 +17,7 @@ class GoogleSearchClient:
         self.url = "https://www.googleapis.com/customsearch/v1"
 
     def search_wikipedia_link(self, question: str) -> dict | None:
-        """
-        Zwraca {title, url} lub None
-        """
+        # Zwraca {title, url} lub None
         params = {
             "key": self.api_key,
             "cx": self.cx,

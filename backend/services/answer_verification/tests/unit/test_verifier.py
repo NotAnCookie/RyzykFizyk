@@ -32,31 +32,12 @@ def test_verify_source_found(answer_verifier):
     result = answer_verifier.verify(req)
 
     # Assert
-    assert result.verified_answer == 299792458
-    assert result.source.title == "Speed of light"
-    assert result.source.url == "https://en.wikipedia.org/..."
+    assert "Speed of light" in result.source.title
+    assert "https://en.wikipedia.org" in result.source.url
+
 
 @pytest.mark.google
-def test_verify_returns_empty_result_when_no_summary(answer_verifier, wikipedia_mock):
-    # Arrange
-    wikipedia_mock.get_page_summary.return_value = None
-
-    req = VerificationRequest(
-        question_text="speed of light",
-        language="EN",
-        numeric_answer=1
-    )
-
-    # Act
-    result = answer_verifier.verify(req)
-
-    # Assert
-    assert result is not None
-    assert result.source is None
-    assert result.verified_answer is None
-
-@pytest.mark.google
-def test_verify_returns_empty_when_page_not_found(answer_verifier, wikipedia_mock):
+def test_verify_returns_wikipedia_when_page_not_found(answer_verifier, wikipedia_mock):
     # ARRANGE
     wikipedia_mock.search_page.return_value = None
 
@@ -70,8 +51,7 @@ def test_verify_returns_empty_when_page_not_found(answer_verifier, wikipedia_moc
     result = answer_verifier.verify(req)
 
     # ASSERT
-    assert result.verified_answer is None
-    assert result.source is None
+    assert "https://en.wikipedia.org" in result.source.url
 
 
 

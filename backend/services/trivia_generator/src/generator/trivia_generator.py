@@ -24,9 +24,10 @@ class TriviaGenerator:
 
     def _validate_input(self, text: str):
         if not text or len(text.strip()) < 3:
-            raise ValueError("Treść pytania jest zbyt krótka lub pusta.")
+            raise ValueError("Treść pytania jest za krótka lub pusta.")
 
     def _build_prompt(self, topic: str, language: Language) -> str:
+        # (language, domyślnie polski)
         template = TRIVIA_PROMPT_TEMPLATE.get(language.value, TRIVIA_PROMPT_TEMPLATE["pl"])
         return template.format(topic=topic)
 
@@ -39,6 +40,7 @@ class TriviaGenerator:
         return match.group(1) if match else None
 
     def _build_trivia_result(self, trivia_text: str) -> TriviaResult:
+        # nie generujemy na razie źródeł ale może się przydadzą
         source_url = self._extract_source(trivia_text)
         source = SourceMetadata(url=source_url) if source_url else None
         return TriviaResult(trivia=trivia_text.strip(), source=source)

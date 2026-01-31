@@ -6,7 +6,7 @@ class APIClient:
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         if not self.api_key:
             raise RuntimeError(
-                "OPENAI_API_KEY not set. Set it in your .env or environment variables."
+                "OPENAI_API_KEY not set. Set it in .env or environment variables."
             )
         self.client = OpenAI(api_key=self.api_key)
 
