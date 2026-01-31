@@ -12,11 +12,6 @@ class SessionState(Enum):
     ENDED = 3
     LOADING = 4
 
-# class Category(str,Enum):
-#     RANDOM = "random"
-#     HISTORY = "history"
-#     GEOGRAPHY = "geography"
-
 
 # przygotowanie dynamicznych wartości enuma
 _dynamic_categories = {key.upper(): key for key in CATEGORIES_KEYWORDS.keys()}

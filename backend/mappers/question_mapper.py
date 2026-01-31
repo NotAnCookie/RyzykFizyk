@@ -26,9 +26,8 @@ from schemas.enums import CategoryEnum as GlobalCategory
 import uuid
 
 def map_generated_question_to_global(q) -> GlobalQuestion:
-    """
-    Mapuje pytanie z generatora (lokalna klasa) na globalny model Question.
-    """
+    # Mapuje pytanie z generatora (lokalna klasa) na globalny model Question.
+
     return GlobalQuestion(
         id=int(uuid.uuid4().int >> 64), 
         text=q.question_text,

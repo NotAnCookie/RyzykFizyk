@@ -25,7 +25,6 @@ def get_session_router(session_manager):
             question = await session_manager.get_next_question(session_id)
         except KeyError:
             raise HTTPException(status_code=404, detail="Session not found")
-        # If session manager indicates no more questions (None), return 204 No Content
         if question is None:
             return Response(status_code=204)
 
