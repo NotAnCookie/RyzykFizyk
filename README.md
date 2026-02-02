@@ -14,8 +14,6 @@ System oparty jest na architekturze webowej z komunikacją frontend ↔ backend 
 
 - **Backend:** Python, wykorzystanie bibliotek AI i integracja z API zewnętrznymi (OpenAI, Wikipedia, Google Custom Search).  
 - **Frontend:** JavaScript + React, dynamiczny i responsywny interfejs użytkownika.  
-- **Baza danych:** MSSQL  
-- **Autoryzacja:** OpenID Connect (logowanie przez Google)  
 - **Platforma:** System platformowo niezależny, implementacja i testy prowadzone na Windows.  
 
 ## Features
