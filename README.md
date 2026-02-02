@@ -72,6 +72,10 @@ GOOGLE_API_KEY=AIza...
 GOOGLE_CX=0123456789:abcdefg
 ```
 
+Uwaga: Aplikacja wymaga własnych kluczy API do usług
+zewnętrznych (OpenAI, Google). Klucze nie są dołączone
+do repozytorium.
+
 ### Uruchomienie backendu
 
 ```bash
