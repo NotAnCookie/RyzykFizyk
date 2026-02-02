@@ -12,14 +12,11 @@ from fastapi import HTTPException
 class SessionManager:
 
     def __init__(self, question_generator, verify_service, trivia_service):
-        # Wstrzykujemy niezależne moduły od dwóch osób
-        self.question_generator = question_generator # Moduł Osoby 2 (Pytania)
-        self.verify_service = verify_service         # Moduł Osoby 1 (Źródła)
-        self.trivia_service = trivia_service         # Moduł Osoby 1 (Ciekawostki)
+        self.question_generator = question_generator 
+        self.verify_service = verify_service         
+        self.trivia_service = trivia_service     
         
         self.sessions: dict[int, GameSession] = {}
-        # Nie potrzebujemy już śledzenia zadań w tle (_background_tasks), 
-        # bo pytanie trafia do sesji dopiero gdy jest kompletne.
 
     def create_session(self, player: Player, language: Language, category_id: str) -> GameSession:
         if category_id not in CATEGORIES_CONFIG:
@@ -67,28 +64,25 @@ class SessionManager:
                 )
                 return await asyncio.to_thread(self.verify_service.verify, req)
 
-            # Uruchamiamy oba serwisy naraz i czekamy aż OBA skończą
+            # uruchamiamy oba zadania równocześnie
             trivia_res, source_res = await asyncio.gather(
                 get_trivia(), 
                 get_source(), 
                 return_exceptions=True
             )
-
-            # --- ETAP 3: Sklejanie wyników ---
             
-            # Obsługa Trivii
+            # ciekawostki
             if trivia_res and not isinstance(trivia_res, Exception):
                 question.trivia = trivia_res.trivia
-                # Czasem trivia generator znajduje przy okazji źródło
+
                 if trivia_res.source and trivia_res.source.url and not question.sourceUrl:
                     question.sourceUrl = trivia_res.source.url
 
-            # Obsługa Źródła
+            # źródła
             if source_res and not isinstance(source_res, Exception):
                 if source_res.source and source_res.source.url and not question.sourceUrl:
                     question.sourceUrl = source_res.source.url
 
-            # Zwracamy w pełni gotowy obiekt
             return question
 
         except Exception as e:
@@ -122,7 +116,6 @@ class SessionManager:
         
         return session
 
-    # --- ZBIERANIE POZOSTAŁYCH (BUFOROWANIE) ---
     async def _collect_remaining_tasks(self, session, pending_tasks):
         """Zbiera resztę pytań, które przegrały wyścig o pierwsze miejsce."""
         for completed in asyncio.as_completed(pending_tasks):
@@ -130,7 +123,7 @@ class SessionManager:
                 q = await completed
                 if q:
                     if len(session.questions) >= MAX_QUESTIONS:
-                        break # Mamy dość pytań
+                        break 
                     
                     q.id = len(session.questions) + 1
                     session.questions.append(q)
@@ -138,17 +131,15 @@ class SessionManager:
             except Exception as e:
                 print(f"⚠️ Błąd w zadaniu tła: {e}")
 
-    # --- POBIERANIE KOLEJNEGO PYTANIA ---
     async def get_next_question(self, session_id: int):
         session = self.sessions[session_id]
         session.currentQuestion += 1
         indx = session.currentQuestion
 
-        # 1. Sprawdzamy bufor (tu leżą gotowe pytania z pre-fillingu)
         if indx < len(session.questions):
             return session.questions[indx]
         
-        # 2. Fallback - jeśli gracz był szybszy niż pre-filling
+        # fallback
         print("⚠️ Pusty bufor! Generuję pytanie na żywo (może potrwać)...")
         q = await self._generate_full_question_pipeline(session)
         if q:
@@ -158,7 +149,6 @@ class SessionManager:
             
         return None
 
-    # --- ZATWIERDZANIE ODPOWIEDZI ---
     async def submit_answer(self, session_id: int, answer: PlayerAnswer):
         session = self.sessions.get(session_id)
         if not session: raise KeyError("Session not found")
@@ -166,10 +156,6 @@ class SessionManager:
         question = next((q for q in session.questions if q.id == answer.questionId), None)
         if not question: raise KeyError("Question not found")
 
-        # Nie musimy czekać na żadne zadania w tle ani sprawdzać flag.
-        # Pytanie 'question' jest kompletne od momentu stworzenia.
-
-        # 1. Weryfikacja liczby (Moduł Osoby 1)
         verify_request = VerificationRequest(
             question_text=question.text,
             numeric_answer=answer.value,
@@ -177,19 +163,14 @@ class SessionManager:
         )
         verify_result = await asyncio.to_thread(self.verify_service.verify, verify_request)
         
-        # 2. Aktualizacja źródła (jeśli weryfikator znalazł lepsze)
         if verify_result.source and verify_result.source.url:
              question.sourceUrl = verify_result.source.url
 
-        # 3. Przekazanie trivii do wyniku
-        # Frontend oczekuje trivii w odpowiedzi z endpointu submit_answer
-        # Przepisujemy ją z obiektu pytania do obiektu wyniku weryfikacji
         if hasattr(verify_result, 'trivia'):
              verify_result.trivia = question.trivia
         else:
              setattr(verify_result, 'trivia', question.trivia)
              
-        # Upewniamy się, że frontend dostanie też źródło
         if hasattr(verify_result, 'source') and verify_result.source:
              verify_result.source.url = question.sourceUrl
 

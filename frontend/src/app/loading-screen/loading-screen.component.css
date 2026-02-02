@@ -5,13 +5,12 @@
     width: 100%;
     height: 100%;
 
-    /* --- SEKJA ODPOWIEDZIALNA ZA ŚRODKOWANIE --- */
-    display: flex;            /* Konieczne, aby align-items działało */
-    flex-direction: column;   /* Ustawia elementy jeden pod drugim (spinner nad tekstem) */
-    justify-content: center;  /* Środkuje w pionie (góra-dół) */
-    align-items: center;      /* Środkuje w poziomie (lewo-prawo) */
+    display: flex;         
+    flex-direction: column;  
+    justify-content: center;
+    align-items: center;     
     
-    z-index: 9999;            /* Musi być na wierzchu */
+    z-index: 9999;        
     transition: background-color 0.3s ease; 
 }
 
@@ -21,9 +20,8 @@
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* Istniejąca klasa dla trybu ciemnego (dodałem backdrop-filter tutaj) */
 .dark-overlay {
-    background: rgba(0, 0, 0, 0.8); /* Nieco ciemniejszy dla lepszego kontrastu */
+    background: rgba(0, 0, 0, 0.8); 
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }

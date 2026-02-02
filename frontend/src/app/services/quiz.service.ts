@@ -2,9 +2,6 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-// --- INTERFEJSY DANYCH (DTO) ---
-// Muszą pasować do tego, czego oczekuje Twój SessionRouter w Pythonie
-
 export interface CreateSessionDTO {
   player_name: string;
   category: string;
@@ -13,7 +10,7 @@ export interface CreateSessionDTO {
 
 export interface PlayerAnswerDTO {
   questionId: string;
-  value: number; // Backend oczekuje liczby (float)
+  value: number; 
 }
 
 export interface CategoryResponse {
@@ -27,13 +24,10 @@ export interface CategoryResponse {
 export class QuizService {
   private http = inject(HttpClient);
 
-  // 1. Adres do SESJI (nowy router)
   private sessionUrl = 'http://localhost:8000/session'; 
   
-  // 2. Adres do KATEGORII (stary router, on się nie zmienia)
   private questionsUrl = 'http://localhost:8000/api/questions';
 
-  // --- NOWE METODY SESYJNE (Session Manager) ---
 
   // KROK 1: Rozpocznij grę
 createSession(playerName: string, category: string, lang: string): Observable<any> {
@@ -74,7 +68,6 @@ createSession(playerName: string, category: string, lang: string): Observable<an
           question_id: questionId,
           value: answerValue
       };
-      //return this.http.post(`${this.sessionUrl}/verify_answer`, body, { withCredentials: true });
       return this.http.post(`${this.sessionUrl}/submit_answer`, body, { withCredentials: true });
   }
 

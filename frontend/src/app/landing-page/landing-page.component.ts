@@ -8,7 +8,6 @@ import { QuestionAnswerCardComponent } from '../question-answer-card/question-an
 import { GameSummaryComponent } from '../game-summary/game-summary.component';
 import { QuizService, CategoryResponse } from '../services/quiz.service';
 import { QuestionResponse } from '../models/question.model';
-// removed unused import
 import { LanguageService } from '../services/language.service';
 import { ThemeService } from '../services/theme.service';
 import { LoadingScreenComponent } from '../loading-screen/loading-screen.component';
@@ -79,7 +78,7 @@ export class LandingPageComponent implements OnInit {
 
   loadCategories() {
     this.quizService.getCategories(this.languageService.currentLang()).subscribe({
-    next: (data: any[]) => { // Używamy any[], żeby TypeScript nie krzyczał przy naprawianiu
+    next: (data: any[]) => {
         
         console.log("Surowe dane z Pythona:", data);
 
@@ -100,10 +99,7 @@ export class LandingPageComponent implements OnInit {
         } else {
           cleanCategories = data;
         }
-        /*this.categories = [
-          { id: 'random', name: 'Random 🎲' },
-          ...cleanCategories
-        ];*/
+
         this.categories = cleanCategories;
 
         if (this.categories.length > 0) {
@@ -181,9 +177,6 @@ startGame() {
     this.showQuestionCard = true;
     this.isLoading = false; 
 
-    // if (this.sessionID) {
-    //     this.loadQuestions(this.sessionID, 6);
-    // }
 }
 
   loadQuestions(sessionId: number, count: number, currentCount: number = 0) {
@@ -283,7 +276,6 @@ startGame() {
 }
 
 handleNextQuestion() {
-    // 1. Sprawdzenie końca gry
     if (this.currentQuestionIndex >= 6) { 
        this.finishGame();
        return;
@@ -326,7 +318,7 @@ handleNextQuestion() {
       this.showAnswerCard = false;
       this.showQuestionCard = true;
       
-      this.isLoading = false; // Wyłączamy loader dopiero gdy wszystko gotowe
+      this.isLoading = false; 
   }
   
   finishGame()
@@ -374,8 +366,7 @@ cancelExit()
   this.showExitConfirmation = false;
 }
 
-  // Handle Tab / Shift+Tab on category buttons: cycle selection and focus among categories only
-  handleCategoryTab(event: KeyboardEvent, idx: number) {
+handleCategoryTab(event: KeyboardEvent, idx: number) {
     if (event.key !== 'Tab') return;
 
     event.preventDefault();
